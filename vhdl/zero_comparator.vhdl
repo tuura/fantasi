@@ -17,7 +17,7 @@ ARCHITECTURE structural OF Generic_zero_comparator IS
 
 BEGIN
 
-    equals <= '1' when (OP = (OP'range => '0')) else '1';
+    equals <= '1' when (OP = (OP'range => '0')) else '0';
     EQ <= EN AND equals;
 
 END structural;
