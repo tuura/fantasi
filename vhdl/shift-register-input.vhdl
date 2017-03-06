@@ -4,7 +4,7 @@ USE ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 LIBRARY work;
 
-ENTITY Generic_shift_register IS
+ENTITY Generic_shift_register_input IS
     GENERIC (N : integer := 8);
     PORT (
         CLK 	: IN    std_logic;
@@ -15,7 +15,7 @@ ENTITY Generic_shift_register IS
         DOUT    : OUT   std_logic_vector(N-1 downto 0));
 END Generic_shift_register;
 
-ARCHITECTURE structural OF Generic_shift_register IS
+ARCHITECTURE structural OF Generic_shift_register_input IS
     
     COMPONENT SYNC_LATCH IS
         PORT (
