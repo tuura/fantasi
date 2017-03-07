@@ -4,11 +4,14 @@ USE ieee.std_logic_1164.all;
 LIBRARY work;
 
 ENTITY FSM IS
-	GENERIC (DATA_WIDTH : integer := 19);
+	GENERIC (DATA_WIDTH : integer := 19;
+             NODES : integer := 15);
 	PORT (
-		CLK	: IN	std_logic;
-		RST	: IN	std_logic;
+		CLK	    : IN	std_logic;
+		RST	    : IN	std_logic;
 		GO		: IN std_logic;
+		COMPL   : OUT std_logic;
+        EN_NODES: in std_logic_vector(NODES-1 downto 0);
 		RESULT	: OUT	std_logic_vector(DATA_WIDTH downto 0));
 END FSM;
 
@@ -19,11 +22,12 @@ ARCHITECTURE FSM_S OF FSM IS
 			CLK			: IN	std_logic;
 			RST			: IN	std_logic;
 			RST_SHIFT	: IN	std_logic;
-			EN				: IN	std_logic;
-			START			: IN	std_logic;
+			EN			: IN	std_logic;
+            EN_NODES    : IN    std_logic_vector(NODES-1 downto 0);
+			START		: IN	std_logic;
 			DIN			: IN	std_logic;
-			DONE			: OUT	std_logic;
-			COMPLETE		: OUT	std_logic;
+			DONE		: OUT	std_logic;
+			COMPLETE	: OUT	std_logic;
 			RESULT		: OUT	std_logic_vector(DATA_WIDTH-1 downto 0));
 	END COMPONENT;
 
@@ -32,9 +36,9 @@ ARCHITECTURE FSM_S OF FSM IS
 		PORT (
 			CLK	: IN	std_logic;
 			RST	: IN	std_logic;
-			EN		: IN	std_logic;
+			EN	: IN	std_logic;
 			DIN	: IN	std_logic_vector(N-1 downto 0);
-			DOUT	: OUT	std_logic_vector(N downto 0));
+			DOUT: OUT	std_logic_vector(N downto 0));
 	END COMPONENT;	
 	
 	type state is (S0,S1,S2,S3,S4,S5,S6,S7,S8,S9);
@@ -46,7 +50,7 @@ BEGIN
 
 	process (CLK,RST)
 	begin
-		if (RST='0') then
+		if (RST='1') then
 			CR <= S0;
 		elsif (CLK'event and CLK='1') then
 			CR <= NX;
@@ -158,20 +162,23 @@ BEGIN
 			CLK			=> CLK,
 			RST			=> rstf,
 			RST_SHIFT	=> rsts,
-			EN				=> en,
-			START			=> start,
+			EN			=> en,
+			EN_NODES	=> EN_NODES,
+			START		=> start,
 			DIN			=> din,
-			DONE			=> done,
-			COMPLETE		=> complete,
+			DONE		=> done,
+			COMPLETE	=> complete,
 			RESULT		=> res);
 			
 	ACCUMULATOR : Generic_accumulator
 		GENERIC MAP(DATA_WIDTH)
 		PORT MAP(
 			CLK	=> CLK,
-			RST	=> NOT(RST),
+			RST	=> RST,
 			EN	=> sum,
 			DIN	=> res,
 			DOUT	=> RESULT);
+			
+	COMPL <= complete;
 	
 END FSM_S;

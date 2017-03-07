@@ -10,35 +10,35 @@ ENTITY FSM_ENABLE_NODES IS
 				 ADDR : integer := 3);
     PORT (
         CLK 	: IN    std_logic;
-		  RST		: IN	  std_logic;
-		  EN		: IN	  std_logic;
+		RST		: IN	std_logic;
+		EN		: IN	std_logic;
         M_SET 	: IN    std_logic;
         ZERO	: IN    std_logic;
         ONE 	: IN    std_logic;
-		  DIN		: IN	  std_logic_vector(ADDR-1 downto 0);
-        DOUT   : OUT   std_logic_vector(NODES-1 downto 0));
+		DIN		: IN	std_logic_vector(ADDR-1 downto 0);
+        DOUT    : OUT   std_logic_vector(NODES-1 downto 0));
 END FSM_ENABLE_NODES;
 
 ARCHITECTURE structural OF FSM_ENABLE_NODES IS
     
-	COMPONENT Generic_shift_register_enable IS
+   COMPONENT Generic_shift_register_enable IS
    GENERIC (N : integer);
    PORT (
         CLK 	: IN    std_logic;
         RST 	: IN    std_logic;
-        SHF_EN : IN    std_logic;
+        SHF_EN  : IN    std_logic;
         DIN 	: IN    std_logic;
-        DOUT   : OUT   std_logic_vector(N-1 downto 0));
-	END COMPONENT;
+        DOUT    : OUT   std_logic_vector(N-1 downto 0));
+   END COMPONENT;
 	
-	COMPONENT Generic_register IS
+   COMPONENT Generic_register IS
    GENERIC (N : integer);
    PORT (
         CLK 	: IN    std_logic;
         RST 	: IN    std_logic;
         EN  	: IN    std_logic;
         DIN 	: IN    std_logic_vector(N-1 downto 0);
-        DOUT   : OUT   std_logic_vector(N-1 downto 0));
+        DOUT    : OUT   std_logic_vector(N-1 downto 0));
 	END COMPONENT;
 	
 	COMPONENT Generic_zero_comparator IS
@@ -136,7 +136,7 @@ BEGIN
 	-- FSMs to control the structure
 	process (CLK,RST)
 	begin
-		if (RST='0') then
+		if (RST='1') then
 			CR_ZERO <= S0;
 			CR_ONE <= T0;
 		elsif (CLK'event and CLK='1') then

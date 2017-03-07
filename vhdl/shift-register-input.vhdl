@@ -13,7 +13,7 @@ ENTITY Generic_shift_register_input IS
         START  	: IN    std_logic;
         DIN 	: IN    std_logic;
         DOUT    : OUT   std_logic_vector(N-1 downto 0));
-END Generic_shift_register;
+END Generic_shift_register_input;
 
 ARCHITECTURE structural OF Generic_shift_register_input IS
     
