@@ -9,14 +9,15 @@ ENTITY FSM_ENABLE_NODES IS
     GENERIC (NODES : integer := 8;
 				 ADDR : integer := 3);
     PORT (
-        CLK 	: IN    std_logic;
+      CLK 	: IN    std_logic;
 		RST		: IN	std_logic;
 		EN		: IN	std_logic;
-        M_SET 	: IN    std_logic;
-        ZERO	: IN    std_logic;
-        ONE 	: IN    std_logic;
+      M_SET 	: IN    std_logic;
+      ZERO	: IN    std_logic;
+      ONE 	: IN    std_logic;
 		DIN		: IN	std_logic_vector(ADDR-1 downto 0);
-        DOUT    : OUT   std_logic_vector(NODES-1 downto 0));
+		SH_DONE : OUT std_logic;
+      DOUT    : OUT   std_logic_vector(NODES-1 downto 0));
 END FSM_ENABLE_NODES;
 
 ARCHITECTURE structural OF FSM_ENABLE_NODES IS
@@ -70,6 +71,7 @@ ARCHITECTURE structural OF FSM_ENABLE_NODES IS
 	 SIGNAL data_in 		: std_logic;
 	 SIGNAL count_en 		: std_logic;
 	 SIGNAL stop 			: std_logic;
+	 SIGNAL one_end		: std_logic;
 	 
 	 type state_zero is (S0,S1,S2);
 	 signal CR_ZERO, NX: state_zero;
@@ -164,13 +166,14 @@ BEGIN
 		end case;
 	end process;
 	
-	process (CR_ONE, one1)
+	process (CR_ONE, one1, stop)
 	begin
 		case CR_ONE is
 			when T0	=>
 				count_en <= '0';
 				shift_one	<= '0';
 				data_in <= '0';
+				one_end <= '1';
 				if one1 = '1' then
 					TX	<= T1;
 				else
@@ -180,11 +183,13 @@ BEGIN
 				count_en <= '1';
 				shift_one <= '0';
 				data_in <= '0';
+				one_end <= '0';
 				TX <= T2;
 			when T2 =>
 				count_en <= '1';
 				shift_one	<= '1';
 				data_in <= '1';
+				one_end <= '0';
 				if stop = '1' then
 					TX <= T3;
 				else
@@ -194,10 +199,12 @@ BEGIN
 				count_en <= '0';
 				shift_one <= '0';
 				data_in <= '0';
+				one_end <= '1';
 				TX <= T0;
 		end case;
 	end process;
 	
 	shift <= shift_one OR shift_zero;
+	SH_DONE <= one_end;
 
 END structural;
