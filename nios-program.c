@@ -39,7 +39,7 @@ float avg_path(int, int);
 float impact(float, float);
 void custom_random_analysis(int, int);
 void random_set(int, int, int);
-void growing_set(int, int, int);
+void growing_set(int, int);
 void brute_force(int);
 int get_number_nodes();
 
@@ -97,9 +97,9 @@ int main() {
 		// growing set analysis
 		if (str_starts_with(cmd, "growing-set")) {
 
-			sscanf(cmd, "growing-set %d %d %d", &from, &to, &n_sim);
+			sscanf(cmd, "growing-set %d %d", &to, &n_sim);
 
-			growing_set(from, to, n_sim);
+			growing_set(to, n_sim);
 			continue;
 		}
 
@@ -258,7 +258,7 @@ void random_set(int from, int to, int n_sim) {
 
 // remove 'n_sim' growing sets of size k, for k = 'from' .. 'to', starting
 // with fixed random permutations as seeds for the growing sets
-void growing_set(int from, int to, int n_sim){
+void growing_set(int to, int n_sim){
 
 	int i, j;
 	int sp;
@@ -468,10 +468,10 @@ void print_help() {
 	printf("Run 'n' simulations, removing 'm' random nodes at every run\n");
 	printf("  random-set 'from' 'to' 'n'\t");
 	printf("Remove 'n' independently chosen sets of size k, for k = 'from' .. 'to'\n");
-	printf("  growing-set 'from' 'to' 'n'\t");
-	printf("Remove 'n' growing sets of size k, for k = 'from' .. 'to', starting\n");
+	printf("  growing-set 'to' 'n'\t");
+	printf("Remove 'n' growing sets of size k, for k = 1 .. 'to', starting\n");
 	printf("\t\t\twith fixed random permutations as seeds for the growing sets\n");
-	printf("  force 'n'\t\t");
+	printf("  force 'to'\t\t");
 	printf("Remove sets of size k, for k = 1 .. 'to', where each node added into the\n");
 	printf("\t\t\tset maximises the impact of the network\n");
 	printf("  result\t\t\t");
