@@ -1,20 +1,22 @@
 name:                fantasi
 version:             0.1.0.0
--- synopsis:
--- description:
-homepage:            https://github.com/Tuura/fantasi#readme
-license:             BSD3
+synopsis:
+homepage:            https://github.com/tuura/fantasi
+license:             MIT
 license-file:        LICENSE
-author:              Alessandro de Gennaro and Andrey Mokhov
--- maintainer:
-copyright:           Alessandro de Gennaro and Andrey Mokhov
+author:              Alessandro de Gennaro <a.de-gennaro@ncl.ac.uk>,
+                     Andrey Mokhov <andrey.mokhov@gmail.com>,
+                     github: @allegroCoder, github: @snowleopard
+maintainer:          Alessandro de Gennaro <a.de-gennaro@ncl.ac.uk>,
+                     github: @allegroCoder
+copyright:           Tuura, github.com/tuura
 category:            Web
 build-type:          Simple
 extra-source-files:  README.md
 cabal-version:       >=1.10
 
 executable fantasi
-  hs-source-dirs:   fantasi
+  hs-source-dirs:   src/fantasi
   main-is:          Main.hs
   other-modules:    Tuura.Fantasi.Main,
                     Tuura.Fantasi.Options
@@ -27,7 +29,7 @@ executable fantasi
   GHC-options:      -Wall -fwarn-tabs
 
 library
-  hs-source-dirs:      src
+  hs-source-dirs:      src/src
   exposed-modules:     Tuura.Fantasi.VHDL.Internal.EnvironmentWriter,
                        Tuura.Fantasi.VHDL.Internal.GraphWriter,
                        Tuura.Fantasi.VHDL.Writer
@@ -40,7 +42,7 @@ library
 
 test-suite fantasi-test
   type:                exitcode-stdio-1.0
-  hs-source-dirs:      test
+  hs-source-dirs:      src/test
   main-is:             Main.hs
   other-modules:       VHDLLiterals
   build-depends:       base

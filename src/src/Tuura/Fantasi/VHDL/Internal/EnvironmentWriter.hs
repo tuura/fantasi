@@ -417,4 +417,4 @@ bitMul :: [P.Vertex] -> Int
 bitMul ns = (bitSum ns) * 2
 
 closeArchitecture :: String
-closeArchitecture = "\nEND test3;"
+closeArchitecture = "\nEND test;"
