@@ -29,7 +29,7 @@ executable fantasi
   GHC-options:      -Wall -fwarn-tabs
 
 library
-  hs-source-dirs:      src/src
+  hs-source-dirs:      src
   exposed-modules:     Tuura.Fantasi.VHDL.Internal.EnvironmentWriter,
                        Tuura.Fantasi.VHDL.Internal.GraphWriter,
                        Tuura.Fantasi.VHDL.Writer
@@ -42,7 +42,7 @@ library
 
 test-suite fantasi-test
   type:                exitcode-stdio-1.0
-  hs-source-dirs:      src/test
+  hs-source-dirs:      test
   main-is:             Main.hs
   other-modules:       VHDLLiterals
   build-depends:       base
