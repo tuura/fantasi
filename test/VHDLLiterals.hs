@@ -177,7 +177,7 @@ enviroFile1 =
     \\t\t\tif s(i) = '1' then tmp := tmp + 1;\n\
     \\t\t\tend if;\n\
     \\t\tend loop;\n\
-    \n\
+    \\n\
 	\\t\treturn tmp;\t\n\
 	\\tend function count_ones;\n\
     \\n\
