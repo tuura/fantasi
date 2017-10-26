@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/tuura/fantasi.svg?branch=CI-travis)](https://travis-ci.org/tuura/fantasi)
+
 # fantasi
 `Fantasi` translates graphs from the GraphML format to VHDL, and also creates an infrastructure for their analysis. It relies on `pangraph` (https://github.com/tuura/pangraph.git) for the parsing of the GraphML files.
 
@@ -13,20 +14,6 @@ Or locally
 ```
 stack build
 stack exec fantasi n1.graphml
-```
-
-## Install using cabal
-
-For installing `fantasi` run:
-```
-cabal install
-```
-
-## Install using ghc
-
-For installing `fantasi` run:
-```
-ghc -isrc -ifantasi fantasi/Main.hs -o Fantasi
 ```
 
 ## Usage
