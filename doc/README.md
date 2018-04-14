@@ -14,21 +14,19 @@ accelerator](https://github.com/allegroCoder/fantasi/tree/documentation/doc#buil
 Feel free to jump to the section you're interested in by clicking on the
 above links.
 
-
 ## Motivational overview
 
 This project is motivated by the domain of *computational drug discovery*. In
-this area, biological systems are modelled by protein-protein interaction
-networks [1] (large-scale graphs), which are analysed for collecting statistics
+this area, biological systems are modelled by protein-protein interaction (PPI)
+networks [[1]](https://github.com/allegroCoder/fantasi/tree/documentation/doc#basic-references) (large-scale graphs), which are analysed for collecting statistics
 and information that are used in pharmacological laboratories for a more
 effective discovery of drugs. Watch the below video to have a deeper insight
 of the drug discovery process, pionereed by *e-Therapeutics PLC*.
 
-
 <p align="center">
   <a href="http://www.youtube.com/watch?feature=player_embedded&v=wQFpTtuzrgA" target="_blank">
- <img src="http://img.youtube.com/vi/wQFpTtuzrgA/0.jpg" alt="WATCH ME" width="480" height="360" border="10"/></a><br>
-  The YouTube video of the drug discovery process.
+  <img src="http://img.youtube.com/vi/wQFpTtuzrgA/0.jpg" alt="WATCH ME" width="480" height="360" border="10"/></a><br>
+  The YouTube video of the drug discovery process. Click the image to play it!
 </p>
 
 Conventional computer architectures cannot process such large graphs
@@ -36,36 +34,82 @@ efficiently. The latter are stored in wide and slow off-chip memories, which
 have to be queried continuously due to irregular memory accesses typical
 of graph-related algorithms (e.g. graph traversal). To overcome this issue
 imposed by the memory-bandwidth, we designed an hardware accelerator where
-a graph, composed by flip-flop registers (nodes) interconnected by wires
-(arcs), is mapped into silicon and is stimulated by an had-hoc infstracture
-with the purpose of extracting statistic from the graph such as connectedness,
-resilience, etc.
-
+a graph is mapped into a digital circuit, where nodes are individual memory
+elements (flip-flop) and arcs are combinational paths between these elements,
+and is stimulated by an had-hoc infstracture with the purpose of extracting
+statistic from the graph such as connectedness, resilience, etc.
 
 <p align="center">
-  <img src="https://github.com/allegroCoder/fantasi/blob/documentation/doc/fig/speed.png" width="520" height="400" border="10"/></a><br>
-  Comparison of network analysis performance.
+  <img src="https://github.com/allegroCoder/fantasi/blob/documentation/doc/fig/speed.png" width="500" border="10"/></a><br>
+  Fig. 1. Comparison of network analysis performance.
 </p>
 
-The above figure shows the scalability of the prototyped accelerator
-versus a software implementation in C++. The number of active edges (|E|)
-in a realistic PPI network is varied and calculated execution time are
-shown. The plot highlights two aspects: (a) The accelerator delivers a speed
-improvement of 2/3 orders of magnitude depending on |E|. (b) While software
-execution time scales linearly with |E|, the accelerator execution time
-slightly decreases, as the higher connectivity reduces the network diameter,
-and also the corresponding time to fully explore all PPI paths thanks to
-hardware parallelism.
+Figure 2 shows the scalability of the prototyped FANTASI accelerator
+versus a software implementation in C++ for the drug discovery analysis. The
+number of active edges (|E|) in a realistic PPI network is varied and
+calculated execution time are shown. The plot highlights two aspects:
+(a) The accelerator delivers a speed improvement of 2/3 orders of magnitude
+depending on |E|. (b) While software execution time scales linearly with |E|,
+the accelerator execution time slightly decreases, as the higher connectivity
+reduces the network diameter, and also the corresponding time to fully
+explore all PPI paths thanks to hardware parallelism.
 
-The FANTASI accelerator is also important as it highlights the benefits of
-having a network of interconnected processing core units, which in this case
+The FANTASI accelerator is important as it highlights the benefits of
+having a network of interconnected processing units, which in this case
 are represented by flip-flop registers, that can operate concurrently. It
 represents a demonstration, at a much lower scale, of the processing capability
 of many-cores architectures, such as the [POETS](https://poets-project.org/).
 
 ## Architectural overview
 
-Partially done in the paper
+The FANTASI accelerator relies on a mechanical, and
+automated, process to map an *application network*
+(in this case the Protein to Protein Interaction network
+[[1]](https://github.com/allegroCoder/fantasi/tree/documentation/doc#basic-references))
+into a digital circuit. Figure 2 shows an example of this process: the
+nodes of a network are converted into flip-flop registers, which are
+interconnected according to the connections specified in the application
+network. The OR gates join multiple incoming connections to a register, and
+propagate messages between registers for computing the network resilience,
+given by the average shortest path of the network. The latter is important
+for the process of drug discovery.
+
+
+<p align="center">
+  <img src="https://github.com/allegroCoder/fantasi/blob/documentation/doc/fig/graph.png" width="720" border="10"/></a><br>
+  Fig. 2. The process of mapping a graph to a digital circuit.
+</p>
+
+The basic idea behind representing graphs using flip-flops and
+combinational paths is that we wish to perform graph traversal by
+propagating logic high values between flip-flops. The logic state of
+each flip-flop therefore indicates whether a given vertex has been
+visited (logic high) or not (logic low). To propagate a 'visited' state
+between flip-flops, we OR the outputs of all vertex neighbours and use
+it as an input to the vertex flip-flop. For further details, refer to
+[[2]](https://github.com/allegroCoder/fantasi/tree/documentation/doc#basic-references).
+
+Figure 3, in turn, shows an high-level view of the FANTASI infrastucture. The
+digital circuit of the application network is at the core of the
+infrastructure, highlighted with a red dashed line. The *hardware graph*
+is encapsulated by the control circuitry to enable/disable selected nodes,
+coordinate computation, and read shortest-path computation results. An
+on-chip software processor (NIOS II) is also included to communicate with
+the host computer and provide an Application Programming Interface (API)
+for network processing.
+
+<p align="center">
+  <img src="https://github.com/allegroCoder/fantasi/blob/documentation/doc/fig/hw.png" width="840" border="10"/></a><br>
+  Fig. 3. The FANTASI hardware accelerator infrastructure.
+</p>
+
+For our experiments, we used the *Altera DE4 board* that integrates the
+*Stratix IV FPGA*. The host computer connects to the boards via a USB cable
+that uses the JTAG UART interface. This is used for downloading the C code to
+the NIOS II soft-processor, which provides the API for graph processing. The
+host computer, instead, interfaces with the user of the FANTASI accelerator.
+
+<!-- TODO: add a paragraph about the front-end Vetrina --> 
 
 ## Prerequisites
 
@@ -103,3 +147,5 @@ Including installation notes.
 ## Basic references
 
 [1] M. P. Young et al. *Chapter 3. Drug Molecules and Biology: Network and Systems Aspects*, in RSC Drug Discovery, pp. 32-49, 2012.
+
+[2] A. Mokhov et al. *Language and Hardware Acceleration Backend for Graph Processing*, Forum on specification & Design Languages, 2017.
