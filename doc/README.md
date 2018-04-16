@@ -120,8 +120,8 @@ discovery analysis.
 * [**GHC compiler 8.2.2 or above**](https://www.haskell.org/ghc/) - the
 Glasgow Haskell compiler is needed to compile and build the `fantasi` tool,
 which generates the hardware graph in the form of VHDL.
-* [**Pangraph library v0.1.1.5**](https://hackage.haskell.org/package/pangraph)
-- The pangraph library, available on hackage on the link provided, is needed
+* [**Pangraph library v0.1.1.5**](https://hackage.haskell.org/package/pangraph) -
+The pangraph library, available on hackage on the link provided, is needed
 to the `fantasi` tool for parsing an application graph (in GraphML format).
 * [**Stack**](https://docs.haskellstack.org/en/stable/README/) - the simplest
 way to install the `fantasi` tool is by using Stack. It can install GHC, and
@@ -172,12 +172,37 @@ documentation.
 
 ## Building an accelerator instance
 
+In the previous section of the tutorial, we described the materials that are needed to start using the FANTASI accelerator. In this section, we describe a step-by-step guide that show how it can be used.
+
 ### Generating FPGA bitstream
 
-* Get GraphML file describing the network for analysis.
-* Run `fantasi`/script to produce VHDL from GraphML.
-* Import VHDL to Quartus, synthesise (expected time: 2 hours)
-* Generating NIOS system VHDL (SOPC?)
+* **1.** Get [GraphML](http://graphml.graphdrawing.org/) file describing the network for analysis. As an example, the application network in Figure 2 is described as below:
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml>
+  <graph id="G" edgedefault="undirected">
+    <node id="A"/>
+    <node id="B"/>
+    <node id="C"/>
+    <node id="D"/>
+    <edge source="A" target="C" directed="false"/>
+    <edge source="C" target="B" directed="false"/>
+    <edge source="B" target="D" directed="false"/>
+    <edge source="A" target="D" directed="false"/>
+  </graph>
+</graphml>
+```
+
+* **2.** The NIOS development kit can be used from within Quartus to generate a VHDL entity of the NIOS II software processor. For simplicity, we provide all the VHDL dependencies needed to generate the FPGA bitstream of the FANTASI accelerator, including the top level entity (`TOP.vhdl`) that includes the NIOS II processor and the instance of the FANTASI infrastructure. This file needs to be customised according to the network that one wants to analyse (see next iteration).
+
+* **3.** Run the Bash script `fantasi-script.sh` to generate the hardware network (Figure 2), the FANTASI infrastructure for the drug discovery analysis (Figure 3), and for modifying the Top level entity that we are going to synthesise into the FPGA.
+```
+./fantasi-script.sh [graphml file] [fantasi tool] [top level VHDL entity]
+```
+The above command will produce the `graph.vhdl` file, which contains the hardware graph in VHDL, and the `sim-environment.vhdl` file, that contains the FANTASI infrastructure. In addition, it will modify the VHDL file specified as top level entity (in this case `vhdl/TOP.vhd`), according to the network characteristics.
+
+* **4.** Move the generated files (`graph.vhdl` and `sim-environment.vhdl`) into the `vhdl/` folder. The content of this folder need to be imported into a Quartus project, and the file `TOP.vhd` has to be set as top level entity of the project.
+
 * Program the FPGA.
 
 ### Downloading NIOS Software
