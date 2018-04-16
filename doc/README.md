@@ -4,19 +4,20 @@ This tutorial guides the reader through the usage of the
 *FANTASI* (FAst NeTwork Analysis in SIlicon) hardware
 accelerator, developed during the EPSRC programme grant
 [POETS](https://poets-project.org/) in partnership with [e-Therapeutics
-PLC](https://www.etherapeutics.co.uk/). First, we provide a [motivational
-overview](https://github.com/allegroCoder/fantasi/tree/documentation/doc#motivational-overview)
+PLC](https://www.etherapeutics.co.uk/). First, we say a few lines about the
+[motivation](https://github.com/allegroCoder/fantasi/tree/documentation/doc#motivational-overview)
 of the project, then we give an [architectural
 overview](https://github.com/allegroCoder/fantasi/tree/documentation/doc#architectural-overview)
 of the accelerator, and finally we
-show how to build one and use it, see [Building an
-accelerator](https://github.com/allegroCoder/fantasi/tree/documentation/doc#building-an-accelerator-instance).
-Feel free to jump to the section you're interested in by clicking on the
+show how to build one and use it, see
+[prerequisites](https://github.com/allegroCoder/fantasi/tree/documentation/doc#prerequisites)
+and [building an accelerator](https://github.com/allegroCoder/fantasi/tree/documentation/doc#building-an-accelerator-instance).
+You can jump to the section you're interested in by clicking on the
 above links.
 
-## Motivational overview
+## Motivation
 
-This project is motivated by the domain of *computational drug discovery*. In
+This project is motivated by the area of *computational drug discovery*. In
 this area, biological systems are modelled by protein-protein interaction (PPI)
 networks [[1]](https://github.com/allegroCoder/fantasi/tree/documentation/doc#basic-references) (large-scale graphs), which are analysed for collecting statistics
 and information that are used in pharmacological laboratories for a more
@@ -109,17 +110,65 @@ that uses the JTAG UART interface. This is used for downloading the C code to
 the NIOS II soft-processor, which provides the API for graph processing. The
 host computer, instead, interfaces with the user of the FANTASI accelerator.
 
-<!-- TODO: add a paragraph about the front-end Vetrina --> 
-
 ## Prerequisites
 
-* FPGA board X
-* Quartus v.N
-* NIOS devkit
-* Pangraph library v.N
-* GHC compiler v.N
+Here is what you need to build and use the `fantasi` tool of this repository,
+which takes as input an application graph (in graphML format) and generates
+an hardware graph (in VHDL), and the FANTASI infrastructure for the drug
+discovery analysis.
 
-Including installation notes.
+* [**GHC compiler 8.2.2 or above**](https://www.haskell.org/ghc/) - the
+Glasgow Haskell compiler is needed to compile and build the `fantasi` tool,
+which generates the hardware graph in the form of VHDL.
+* [**Pangraph library v0.1.1.5**](https://hackage.haskell.org/package/pangraph)
+- The pangraph library, available on hackage on the link provided, is needed
+to the `fantasi` tool for parsing an application graph (in GraphML format).
+* [**Stack**](https://docs.haskellstack.org/en/stable/README/) - the simplest
+way to install the `fantasi` tool is by using Stack. It can install GHC, and
+download all the packages needed to building the `fantasi` tool automatically.
+
+
+For installing the `fantasi` tool globally, you need to run the following command.
+```
+stack install
+fantasi --help
+```
+
+For local install:
+```
+stack build
+stack exec fantasi -- --help
+```
+
+The second command `fantasi --help` displays the help of the tool, which is shown below:
+```
+Usage: fantasi [graphml file]
+  -n FILEPATH  --graph-name=FILEPATH  VHDL graph output file-path
+  -s FILEPATH  --sim-name=FILEPATH    VHDL simulation environment output file-path
+  -h           --help                 Show this help message
+  -v           --version              Show version of Fantasi
+```
+
+To use the FANTASI hardware accelerator, on the other hand, you will need the following:
+
+* **An Altera FPGA board** - in our experiments, we used the Altera DE4
+board that embeds the Stratix IV FPGA. However, any FPGA by Altera can be
+used.
+* [**Quartus Prime
+Software**](https://www.altera.com/downloads/download-center.html) - the
+Altera design environment for the usage of any Altera FPGA board. We
+suggest to download the latest version of the software currently available. The
+lite edition version enables the compilation and synthesis of hardware into some
+of the Altera FPGA boards available. However, a license is required for the usage
+of the latest and bigger FPGA, such as the one that we used.
+* [**NIOS II
+devkit**](https://www.altera.com/products/processors/overview.html) -
+the NIOS II is a software processor that can be synthesised in any Altera
+FPGA. The development kit available with Quartus can be used to customise
+and synthesise the processor into the FPGA.
+
+For more information about how to install the above tool, refer to the official
+documentation.
 
 ## Building an accelerator instance
 
