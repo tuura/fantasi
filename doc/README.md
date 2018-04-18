@@ -220,10 +220,10 @@ the FPGA (`dependencies/TOP.vhd`).
 * **4.** Create a new project in Quartus and select the FPGA that
 you want to use. Afterwards, import the generated files (`graph.vhdl` and
 `sim-environment.vhdl`), and the content of the `dependencies/` folder into the Quartus
-project. Finally, set the file `TOP.vhd` as top level entity of the project. **Note:**
-in order to import the Nios II processor and the pll module, you need to import
-into quartus the files with extension `.qip`, which can be found in the corresponding
-folders.
+project, including the `constraints.sdc` file. Finally, set the file `TOP.vhd`
+as top level entity of the project. **Note:** in order to import the Nios
+II processor and the pll module, you need to import into quartus the files
+with extension `.qip`, which can be found in the corresponding folders.
 
 * **5.** Run the compilation process in Quartus, and then program the
 generated bistream file into the FPGA.
@@ -243,7 +243,7 @@ we have used (16.1), `Eclipse` can be found under the tab `Tools -> Nios II
 Software Build Tools for Eclipse`.
 
 * **1.** In the repository, you can find the C-based API ready to compile,
-build and download into the Nios II processor, see file `fantasi-API.c`. To
+build and download into the Nios II processor, see file `nios-API.c`. To
 use this API, first you will need to create a project inside the `Nios
 II Software Build Tools for Eclipse` plugin. The project that is created
 is divided in 2 sub-projects: (1) the first one contains tha application
@@ -253,7 +253,7 @@ the low level drivers that are needed to interface with the board that
 one is using. To create this two projects, click on the tab `File ->
 Nios II Application and BSP from Template` from within `Eclipse` design
 environment. A window (see Fig. 4) will be opening, where you need to
-select the SOPC file (select the file `fantasi-niosII.sopcinfo` of the repo,
+select the SOPC file (select the file `niosII.sopcinfo` of the repo,
 see note below), write a name for the project (let's call it 'FANTASI'),
 and choose a project template (select the 'Blank Project'). The SOPC file
 is created by the Nios II Development kit (see Point 2 of [Generating FPGA
@@ -264,13 +264,13 @@ bitstream](https://github.com/allegroCoder/fantasi/tree/documentation/doc#genera
   Fig. 4. Nios II Application and BSP from Template.
 </p>
 
-*Note:* the file 'fantasi-niosII.sopcinfo' provided in this repository works
-specifically with the FPGA (Stratix IV EP4SGX230KF40C2). If you want to
+*Note:* the file 'niosII.sopcinfo' provided in this repository in `dependencies/niosII/`
+works specifically with the FPGA (Stratix IV EP4SGX230KF40C2). If you want to
 use a different board, you will have to generate the Nios II processor by
 following this tutorial: [Generate your own Nios II processor](https://github.com/allegroCoder/fantasi/tree/documentation/doc#generate-your-own-nios-ii-processor).
 
 * **2.** Now that you created the projects, you have to insert the file
-`fantasi-API.c`, provided inside the repository, inside the 'FANTASI'
+`nios-API.c`, provided inside the repository, inside the 'FANTASI'
 (non 'FANTASI_BSP') project. This file contains the API for accessing the
 HW accelerator, and it is ready to be compiled, built and downloaded into
 the Nios II processor for its execution.

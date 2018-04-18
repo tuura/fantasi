@@ -1,0 +1,15 @@
+	component system1 is
+		port (
+			clk_clk                   : in  std_logic                     := 'X';             -- clk
+			input0_extern_con_export  : in  std_logic_vector(31 downto 0) := (others => 'X'); -- export
+			input1_extern_con_export  : in  std_logic_vector(31 downto 0) := (others => 'X'); -- export
+			input2_extern_con_export  : in  std_logic_vector(31 downto 0) := (others => 'X'); -- export
+			input3_extern_con_export  : in  std_logic_vector(31 downto 0) := (others => 'X'); -- export
+			output0_extern_con_export : out std_logic_vector(31 downto 0);                    -- export
+			output1_extern_con_export : out std_logic_vector(31 downto 0);                    -- export
+			output2_extern_con_export : out std_logic_vector(31 downto 0);                    -- export
+			output3_extern_con_export : out std_logic_vector(31 downto 0);                    -- export
+			reset_reset_n             : in  std_logic                     := 'X'              -- reset_n
+		);
+	end component system1;
+
