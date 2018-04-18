@@ -224,7 +224,8 @@ the Nios II processor and the pll module, you need to import into quartus the
 files with extension `.qip`, which can be found in the corresponding folders.
 
 * **5.** Run the compilation process in Quartus, and then program the
-generated bistream file into the FPGA.
+generated bistream file into the FPGA. The expected compilation time for a network
+composed of about 1k nodes is of 20 minutes.
 
 As a result, the FANTASI accelerator should be mapped onto the FPGA.
 
@@ -328,8 +329,13 @@ enabled.
 average shortest path (and the impact on the resilience of the network)
 with the nodes with indices {10, 60, 99} are disabled.
 
+**Any known issues?**
+* The `nios2-terminal` tool, in linux, does not display the characters introduced
+by the keyboard. The characters will still be recognised.
+
 ## Generate your own Nios II processor
 
+Work in progress...
 <!-- TODO: guide on how to generate the Nios II processor from within Quartus -->
 
 ## Basic references
