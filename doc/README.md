@@ -345,4 +345,3 @@ Systems Aspects*, in RSC Drug Discovery, pp. 32-49, 2012.
 
 [2] A. Mokhov et al. *Language and Hardware Acceleration Backend for Graph
 Processing*, Forum on specification & Design Languages, 2017.
-
