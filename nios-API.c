@@ -85,6 +85,39 @@ int main() {
 
 		}
 
+		// Run a drug-based analysis
+		if (str_starts_with(cmd, "test-drug")) {
+
+			float avg;
+			int sp;
+			int *disabled_nodes;
+			int n;
+			int numchar = 0, num = 0;
+
+			sscanf(cmd, "test-drug %d --%n", &n, &numchar);
+
+			if (n < 1) continue;
+
+			disabled_nodes = (int*) malloc(sizeof(int) * n);
+			for(int i=0; i<n; i++) {
+				sscanf(cmd+numchar, "%d%n", &disabled_nodes[i], &num);
+				numchar+=num;
+			}
+			qsort(disabled_nodes, n, sizeof(int), cmpfunc);
+
+			reset_network();
+			turnoff_nodes(disabled_nodes, n);
+			start_test();
+			sp = read_result();
+			printf("Result: %d\n", sp);
+			avg = avg_path(sp,n);
+			printf("Average: %.5f\n", avg);
+
+			free(disabled_nodes);
+			continue;
+
+		}
+
 		// random set analysis
 		if (str_starts_with(cmd, "random-set")) {
 
@@ -464,6 +497,9 @@ void print_help() {
 	printf("Commands:\n");
 	printf("  start\t\t\t");
 	printf("Run 1 simulation with all the nodes enabled\n");
+	printf("  test-drug 'n' -- [off nodes]\t");
+	printf("Run a simulation with the following 'n' nodes disabled in the form of '5 100 1 305'\n");
+	printf("\t\t\tExample: test-drug 3 -- 5 10 946\n");
 	printf("  random 'n' 'm'\t\t");
 	printf("Run 'n' simulations, removing 'm' random nodes at every run\n");
 	printf("  random-set 'from' 'to' 'n'\t");

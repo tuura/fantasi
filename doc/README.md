@@ -89,19 +89,17 @@ between flip-flops, we OR the outputs of all vertex neighbours and use
 it as an input to the vertex flip-flop. For further details, refer to
 [[2]](https://github.com/allegroCoder/fantasi/tree/documentation/doc#basic-references).
 
-Figure 3, in turn, shows an high-level view of the FANTASI infrastucture. The
+Figure 3, in turn, shows an high-level view of the FANTASI infrastructure. The
 digital circuit of the application network is at the core of the
-infrastructure, highlighted with a red dashed line. The *hardware graph*
+accelerator, highlighted with a red dashed line. The *hardware graph*
 is encapsulated by the control circuitry to enable/disable selected nodes,
 coordinate computation, and read shortest-path computation results. An
 on-chip software processor (NIOS II) is also included to communicate with
 the host computer and provide an Application Programming Interface (API)
-for network processing. The basic idea of the FANTASI infrastructure is to allow
+for network processing. The basic idea of the FANTASI accelerator is to allow
 the reconfiguration of the network at runtime, in order to run multiple analyisis
 on the same network under different configurations, without requiring the network
 resynthesis. Each configuration is identified by a set of nodes that are disabled.
-
-<!-- TODO:  write something about the network reconfiguration-->
 
 <p align="center">
   <img src="https://github.com/allegroCoder/fantasi/blob/documentation/doc/fig/hw.png" width="840" border="10"/></a><br>
@@ -151,13 +149,13 @@ Usage: fantasi [graphml file]
 To use the FANTASI hardware accelerator, on the other hand, you will need the following:
 
 * **An Altera FPGA board** - in our experiments, we used the Altera DE4
-board that embeds the Stratix IV FPGA. However, any FPGA by Altera can be
-used.
+board that embeds the Stratix IV FPGA (EP4SGX230KF40C2). However, any FPGA by
+Altera can be used.
 * [**Quartus Prime
 Software**](https://www.altera.com/downloads/download-center.html) - the
 Altera design environment for the usage of any Altera FPGA board. We
 suggest to download the latest version of the software currently available. The
-lite edition version enables the compilation and synthesis of hardware into some
+lite edition version allows the compilation and synthesis of hardware into some
 of the Altera FPGA boards available. However, a license is required for the usage
 of the latest and bigger FPGA, such as the one that we used. In our experiments,
 we used the Quartus v16.1.
@@ -173,8 +171,8 @@ documentation.
 ## Building an accelerator instance
 
 In the previous section of the tutorial, we described the materials that are
-needed to start using the FANTASI accelerator. In this section, we describe
-a step-by-step guide that show how it can be used.
+needed to start using the FANTASI accelerator. In this section, we describe a
+step-by-step guide that show how it can be used.
 
 ### Generating FPGA bitstream
 
@@ -198,66 +196,61 @@ the network for analysis. As an example, the application network in Figure
 </graphml>
 ```
 
-* **2.** The NIOS development kit can be used from within Quartus to generate
-a VHDL entity of the NIOS II software processor. For simplicity, we provide
+* **2.** The Nios development kit can be used from within Quartus to generate
+a VHDL entity of the Nios II software processor. For simplicity, we provide
 all the dependencies (inside the `dependencies/` folder of the repository)
-needed to generate the FPGA bitstream of the FANTASI
-accelerator, including the top level entity (`TOP.vhdl`) that includes the
-NIOS II processor and the instance of the FANTASI infrastructure. This file
-needs to be customised according to the network that one wants to analyse
-(see next iteration).
+needed to generate the FPGA bitstream of the FANTASI accelerator, including the
+top level entity (`TOP.vhdl`) where an instance of the Nios II processor is connected
+to the modules for the drug discovery analysis. The top entity file needs to be customised 
+according to the network that one wants to analyse (see next iteration).
 
 * **3.** Run the Bash script `script.sh` to generate the hardware network
-(output file: `graph.vhdl`, see Figure 2), the FANTASI infrastructure for the
-drug discovery analysis (output file: `sim-environment.vhdl`, see Figure 3),
-and for modifying the Top level entity that we are going to synthesise into
-the FPGA (`dependencies/TOP.vhd`).
+(output file: `graph.vhdl`, see Figure 2), the modules for the drug analysis 
+(output file: `sim-environment.vhdl`, see Figure 3), and for modifying the top
+level entity of the whole HW design (named `dependencies/TOP.vhd`).
 
 ```
 ./script.sh [graphml file] [fantasi tool] [top level VHDL entity]
 ```
 
 * **4.** Create a new project in Quartus and select the FPGA that
-you want to use. Afterwards, import the generated files (`graph.vhdl` and
-`sim-environment.vhdl`), and the content of the `dependencies/` folder into the Quartus
-project, including the `constraints.sdc` file. Finally, set the file `TOP.vhd`
-as top level entity of the project. **Note:** in order to import the Nios
-II processor and the pll module, you need to import into quartus the files
-with extension `.qip`, which can be found in the corresponding folders.
+you want to use. In this tutorial, we assume the usage of the Stratix IV FPGA
+(EP4SGX230KF40C2), so that to enjoy the ready-to-use Nios II processor instance
+in `dependencies/`. Afterwards, import the generated files (`graph.vhdl` and
+`sim-environment.vhdl`), and the content of the `dependencies/` folder into
+the Quartus project, including the `constraints.sdc` file. Finally, set the
+file `TOP.vhd` as top level entity of the project. **Note:** in order to import
+the Nios II processor and the pll module, you need to import into quartus the
+files with extension `.qip`, which can be found in the corresponding folders.
 
 * **5.** Run the compilation process in Quartus, and then program the
 generated bistream file into the FPGA.
 
-As a result, the FANTASI accelerator and the Nios II software processor
-should be mapped onto the FPGA that you are using.
+As a result, the FANTASI accelerator should be mapped onto the FPGA.
 
 ### Downloading NIOS Software
 
 If you followed the previous steps, now you should have the FANTASI
-accelerator and the NIOS II processor mapped inside the FPGA of the board
-that you are using. In this step, we will download the C-based API into the
-NIOS II processor that enables the usage of the FANTASI accelerator from an
-external host computer. To do this, we will use the *Eclipse* development
-environment plugin embedded within Quartus. In the version of Quartus that
-we have used (16.1), `Eclipse` can be found under the tab `Tools -> Nios II
+accelerator mapped onto the FPGA. Now, we will have to download the C-based API into the
+Nios II processor, which we will use as interface to the FANTASI accelerator from an
+external host computer. To do this, open the *Eclipse* development
+environment plugin embedded within Quartus: under the tab `Tools -> Nios II
 Software Build Tools for Eclipse`.
 
 * **1.** In the repository, you can find the C-based API ready to compile,
 build and download into the Nios II processor, see file `nios-API.c`. To
 use this API, first you will need to create a project inside the `Nios
 II Software Build Tools for Eclipse` plugin. The project that is created
-is divided in 2 sub-projects: (1) the first one contains tha application
+is divided in 2 sub-projects: (1) the first one contains the application
 that you want to run in the Nios II processor, (2) the second one has
 as suffix '_BSP', which stands for Board Support Package, and contains
-the low level drivers that are needed to interface with the board that
-one is using. To create this two projects, click on the tab `File ->
+the low level drivers that are needed to interface with the FPGA board.
+To create this two projects, click on the tab `File ->
 Nios II Application and BSP from Template` from within `Eclipse` design
-environment. A window (see Fig. 4) will be opening, where you need to
-select the SOPC file (select the file `niosII.sopcinfo` of the repo,
+environment. In the opened window (see Fig. 4),
+select the SOPC file (file `dependencies/niosII/niosII.sopcinfo` of the repo,
 see note below), write a name for the project (let's call it 'FANTASI'),
-and choose a project template (select the 'Blank Project'). The SOPC file
-is created by the Nios II Development kit (see Point 2 of [Generating FPGA
-bitstream](https://github.com/allegroCoder/fantasi/tree/documentation/doc#generating-fpga-bitstream)).
+and select 'Blank Project' as project template.
 
 <p align="center">
   <img src="https://github.com/allegroCoder/fantasi/blob/documentation/doc/fig/nios-projects.png" width="450" border="10"/></a><br>
@@ -269,11 +262,11 @@ works specifically with the FPGA (Stratix IV EP4SGX230KF40C2). If you want to
 use a different board, you will have to generate the Nios II processor by
 following this tutorial: [Generate your own Nios II processor](https://github.com/allegroCoder/fantasi/tree/documentation/doc#generate-your-own-nios-ii-processor).
 
-* **2.** Now that you created the projects, you have to insert the file
+* **2.** Once that you created the Eclipse projects, insert the file
 `nios-API.c`, provided inside the repository, inside the 'FANTASI'
 (non 'FANTASI_BSP') project. This file contains the API for accessing the
-HW accelerator, and it is ready to be compiled, built and downloaded into
-the Nios II processor for its execution.
+modules for the drug discovery analysis, and it is ready to be compiled, built
+and downloaded into the Nios II processor for its execution.
 
 * **3.** The next step is to create the 'Run configuration' properties
 within `Eclipse` for building the project and download it into the Nios
@@ -328,9 +321,10 @@ Commands:
   help                           Print help of the tool
 ```
 
-**Can you give me any examples?** For example, by running `start`, you
-will compute the average shortest path of the networks with all the nodes
-enabled. With the command `test-drug 3 -- 10 60 99`, you will compute the
+**Can you give me any examples?** 
+* By running `start`, you will compute the average shortest path of the networks with all the nodes
+enabled.
+* With the command `test-drug 3 -- 10 60 99`, you will compute the
 average shortest path (and the impact on the resilience of the network)
 with the nodes with indices {10, 60, 99} are disabled.
 
