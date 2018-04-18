@@ -118,16 +118,14 @@ host computer, instead, interfaces with the user of the FANTASI accelerator.
 
 Here is what you need to build and use the `fantasi` tool of this repository:
 
-* [**GHC compiler 8.2.2 or above**](https://www.haskell.org/ghc/) - the
-Glasgow Haskell compiler is needed to compile and build the `fantasi` tool,
-which generates the hardware graph in the form of VHDL.
-* [**Pangraph library v0.1.1.5**](https://hackage.haskell.org/package/pangraph) -
-The pangraph library, available on hackage on the link provided, is needed
-to the `fantasi` tool for parsing an application graph (in GraphML format).
 * [**Stack**](https://docs.haskellstack.org/en/stable/README/) - the simplest
 way to install the `fantasi` tool is by using Stack. It can install GHC, and
 download all the packages needed to building the `fantasi` tool automatically.
-
+* [**GHC compiler 8.2.2**](https://www.haskell.org/ghc/) - the
+Glasgow Haskell compiler.
+* [**Pangraph library v0.1.1.5**](https://hackage.haskell.org/package/pangraph) -
+The pangraph library, available on hackage on the link provided, is needed
+for parsing an application graph (in GraphML format).
 
 For installing the `fantasi` tool globally, you need to run the following command.
 ```
@@ -161,7 +159,8 @@ Altera design environment for the usage of any Altera FPGA board. We
 suggest to download the latest version of the software currently available. The
 lite edition version enables the compilation and synthesis of hardware into some
 of the Altera FPGA boards available. However, a license is required for the usage
-of the latest and bigger FPGA, such as the one that we used.
+of the latest and bigger FPGA, such as the one that we used. In our experiments,
+we used the Quartus v16.1.
 * [**NIOS II
 devkit**](https://www.altera.com/products/processors/overview.html) -
 the NIOS II is a software processor that can be synthesised in any Altera
@@ -177,10 +176,12 @@ In the previous section of the tutorial, we described the materials that are
 needed to start using the FANTASI accelerator. In this section, we describe
 a step-by-step guide that show how it can be used.
 
-
 ### Generating FPGA bitstream
 
-* **1.** Get a [GraphML](http://graphml.graphdrawing.org/) file describing the network for analysis. As an example, the application network in Figure 2 is described as below:
+* **1.** Get a [GraphML](http://graphml.graphdrawing.org/) file describing
+the network for analysis. As an example, the application network in Figure
+2 is described as below:
+
 ```
 <?xml version="1.0" encoding="UTF-8"?>
 <graphml>
@@ -199,30 +200,30 @@ a step-by-step guide that show how it can be used.
 
 * **2.** The NIOS development kit can be used from within Quartus to generate
 a VHDL entity of the NIOS II software processor. For simplicity, we provide
-all the VHDL dependencies needed to generate the FPGA bitstream of the FANTASI
+all the dependencies (inside the `dependencies/` folder of the repository)
+needed to generate the FPGA bitstream of the FANTASI
 accelerator, including the top level entity (`TOP.vhdl`) that includes the
 NIOS II processor and the instance of the FANTASI infrastructure. This file
 needs to be customised according to the network that one wants to analyse
 (see next iteration).
 
-* **3.** Run the Bash script `fantasi-script.sh` to generate the hardware
-network (Figure 2), the FANTASI infrastructure for the drug discovery analysis
-(Figure 3), and for modifying the Top level entity that we are going to
-synthesise into the FPGA.
+* **3.** Run the Bash script `script.sh` to generate the hardware network
+(output file: `graph.vhdl`, see Figure 2), the FANTASI infrastructure for the
+drug discovery analysis (output file: `sim-environment.vhdl`, see Figure 3),
+and for modifying the Top level entity that we are going to synthesise into
+the FPGA (`dependencies/TOP.vhd`).
 
 ```
-./fantasi-script.sh [graphml file] [fantasi tool] [top level VHDL entity]
+./script.sh [graphml file] [fantasi tool] [top level VHDL entity]
 ```
-The above command will produce the `graph.vhdl` file, which contains the
-hardware graph in VHDL, and the `sim-environment.vhdl` file, that contains the
-FANTASI infrastructure. In addition, it will modify the VHDL file specified
-as top level entity (in this case `vhdl/TOP.vhd`), according to the network
-characteristics.
 
 * **4.** Create a new project in Quartus and select the FPGA that
-you want to use. And then import the generated files (`graph.vhdl` and
-`sim-environment.vhdl`), and the content of the `vhdl/` folder into the Quartus
-project. Finally, set the file `TOP.vhd` as top level entity of the project.
+you want to use. Afterwards, import the generated files (`graph.vhdl` and
+`sim-environment.vhdl`), and the content of the `dependencies/` folder into the Quartus
+project. Finally, set the file `TOP.vhd` as top level entity of the project. **Note:**
+in order to import the Nios II processor and the pll module, you need to import
+into quartus the files with extension `.qip`, which can be found in the corresponding
+folders.
 
 * **5.** Run the compilation process in Quartus, and then program the
 generated bistream file into the FPGA.
@@ -259,7 +260,7 @@ is created by the Nios II Development kit (see Point 2 of [Generating FPGA
 bitstream](https://github.com/allegroCoder/fantasi/tree/documentation/doc#generating-fpga-bitstream)).
 
 <p align="center">
-  <img src="https://github.com/allegroCoder/fantasi/blob/documentation/doc/fig/nios-project.png" width="450" border="10"/></a><br>
+  <img src="https://github.com/allegroCoder/fantasi/blob/documentation/doc/fig/nios-projects.png" width="450" border="10"/></a><br>
   Fig. 4. Nios II Application and BSP from Template.
 </p>
 
@@ -298,7 +299,16 @@ the accelerator.
 
 ## Using the accelerator
 
-**How to run commands on the FANTASI API?** At this point, the Nios II processor is ready to accept commands for running drug discovery analysis over the synthesised network. The simplest way to use the accelerator is via the `Console` within Eclipse environment. Otherwise, one could use the tool `nios2-terminal` (provided inside the Quartus installation folder `~/intelFPGA/[Quartus-version]/quartus/[OS-used]/`) to connect the terminal to the FPGA board, and to run the FANTASI API provided. If you want to use the terminal, you need to run the `nios2-terminal` in order to be prompted to use the terminal as FANTASI command line.
+**How to run commands on the FANTASI API?** At this point, the Nios II
+processor is ready to accept commands for running drug discovery analysis
+over the synthesised network. The simplest way to use the accelerator is
+via the `Console` within Eclipse environment. Otherwise, one could use
+the tool `nios2-terminal` (provided inside the Quartus installation folder
+`~/intelFPGA/[Quartus-version]/quartus/[OS-used]/`) to connect the terminal
+to the FPGA board, and to run the FANTASI API provided. If you want to use
+the terminal, you need to run the `nios2-terminal` in order to be prompted
+to use the terminal as FANTASI command line.
+
 
 **Which commands are available?** Find below the help of the FANTASI API.
 ```
@@ -318,11 +328,11 @@ Commands:
   help                           Print help of the tool
 ```
 
-**Example of usage:**
-For example, by running `start`, you will compute the average shortest path
-of the networks with all the nodes enabled. With the command `test-drug 3 --
-10 60 99`, you will compute the average shortest path (and the impact on the
-resilience of the network) when the nodes with indices {10, 60, 99} are off.
+**Can you give me any examples?** For example, by running `start`, you
+will compute the average shortest path of the networks with all the nodes
+enabled. With the command `test-drug 3 -- 10 60 99`, you will compute the
+average shortest path (and the impact on the resilience of the network)
+with the nodes with indices {10, 60, 99} are disabled.
 
 ## Generate your own Nios II processor
 
@@ -330,6 +340,9 @@ resilience of the network) when the nodes with indices {10, 60, 99} are off.
 
 ## Basic references
 
-[1] M. P. Young et al. *Chapter 3. Drug Molecules and Biology: Network and Systems Aspects*, in RSC Drug Discovery, pp. 32-49, 2012.
+[1] M. P. Young et al. *Chapter 3. Drug Molecules and Biology: Network and
+Systems Aspects*, in RSC Drug Discovery, pp. 32-49, 2012.
 
-[2] A. Mokhov et al. *Language and Hardware Acceleration Backend for Graph Processing*, Forum on specification & Design Languages, 2017.
+[2] A. Mokhov et al. *Language and Hardware Acceleration Backend for Graph
+Processing*, Forum on specification & Design Languages, 2017.
+
