@@ -5,13 +5,13 @@ This tutorial guides the reader through the usage of the
 accelerator, developed during the EPSRC programme grant
 [POETS](https://poets-project.org/) in partnership with [e-Therapeutics
 PLC](https://www.etherapeutics.co.uk/). First, we say a few lines about the
-[motivation](https://github.com/allegroCoder/fantasi/tree/documentation/doc#motivational-overview)
+[motivation](https://github.com/tuura/fantasi/tree/master/doc#motivation)
 of the project, then we give an [architectural
-overview](https://github.com/allegroCoder/fantasi/tree/documentation/doc#architectural-overview)
+overview](https://github.com/tuura/fantasi/tree/master/doc#architectural-overview)
 of the accelerator, and finally we
 show how to build one and use it, see
-[prerequisites](https://github.com/allegroCoder/fantasi/tree/documentation/doc#prerequisites)
-and [building an accelerator](https://github.com/allegroCoder/fantasi/tree/documentation/doc#building-an-accelerator-instance).
+[prerequisites](https://github.com/tuura/fantasi/tree/master/doc#prerequisites)
+and [building an accelerator](https://github.com/tuura/fantasi/tree/master/doc#building-an-accelerator-instance).
 You can jump to the section you're interested in by clicking on the
 above links.
 
@@ -19,7 +19,7 @@ above links.
 
 This project is motivated by the area of *computational drug discovery*. In
 this area, biological systems are modelled by protein-protein interaction (PPI)
-networks [[1]](https://github.com/allegroCoder/fantasi/tree/documentation/doc#basic-references) (large-scale graphs), which are analysed for collecting statistics
+networks [[1]](https://github.com/tuura/fantasi/tree/master/doc#basic-references) (large-scale graphs), which are analysed for collecting statistics
 and information that are used in pharmacological laboratories for a more
 effective discovery of drugs. Watch the below video to have a deeper insight
 of the drug discovery process, pionereed by *e-Therapeutics PLC*.
@@ -41,7 +41,7 @@ and is stimulated by an had-hoc infstracture with the purpose of extracting
 statistic from the graph such as connectedness, resilience, etc.
 
 <p align="center">
-  <img src="https://github.com/allegroCoder/fantasi/blob/documentation/doc/fig/speed.png" width="500" border="10"/></a><br>
+  <img src="https://github.com/tuura/fantasi/blob/master/doc/fig/speed.png" width="500" border="10"/></a><br>
   Fig. 1. Comparison of network analysis performance.
 </p>
 
@@ -66,7 +66,7 @@ of many-cores architectures, such as the [POETS](https://poets-project.org/).
 The FANTASI accelerator relies on a mechanical, and
 automated, process to map an *application network*
 (in this case the Protein to Protein Interaction network
-[[1]](https://github.com/allegroCoder/fantasi/tree/documentation/doc#basic-references))
+[[1]](https://github.com/tuura/fantasi/tree/master/doc#basic-references))
 into a digital circuit. Figure 2 shows an example of this process: the
 nodes of a network are converted into flip-flop registers, which are
 interconnected according to the connections specified in the application
@@ -76,7 +76,7 @@ given by the average shortest path of the network. The latter is important
 for the process of drug discovery.
 
 <p align="center">
-  <img src="https://github.com/allegroCoder/fantasi/blob/documentation/doc/fig/graph.png" width="720" border="10"/></a><br>
+  <img src="https://github.com/tuura/fantasi/blob/master/doc/fig/graph.png" width="720" border="10"/></a><br>
   Fig. 2. The process of mapping a graph to a digital circuit.
 </p>
 
@@ -87,7 +87,7 @@ each flip-flop therefore indicates whether a given vertex has been
 visited (logic high) or not (logic low). To propagate a 'visited' state
 between flip-flops, we OR the outputs of all vertex neighbours and use
 it as an input to the vertex flip-flop. For further details, refer to
-[[2]](https://github.com/allegroCoder/fantasi/tree/documentation/doc#basic-references).
+[[2]](https://github.com/tuura/fantasi/tree/master/doc#basic-references).
 
 Figure 3, in turn, shows an high-level view of the FANTASI infrastructure. The
 digital circuit of the application network is at the core of the
@@ -102,7 +102,7 @@ on the same network under different configurations, without requiring the networ
 resynthesis. Each configuration is identified by a set of nodes that are disabled.
 
 <p align="center">
-  <img src="https://github.com/allegroCoder/fantasi/blob/documentation/doc/fig/hw.png" width="840" border="10"/></a><br>
+  <img src="https://github.com/tuura/fantasi/blob/master/doc/fig/hw.png" width="840" border="10"/></a><br>
   Fig. 3. The FANTASI hardware accelerator infrastructure.
 </p>
 
@@ -254,14 +254,14 @@ see note below), write a name for the project (let's call it 'FANTASI'),
 and select 'Blank Project' as project template.
 
 <p align="center">
-  <img src="https://github.com/allegroCoder/fantasi/blob/documentation/doc/fig/nios-projects.png" width="450" border="10"/></a><br>
+  <img src="https://github.com/tuura/fantasi/blob/master/doc/fig/nios-projects.png" width="450" border="10"/></a><br>
   Fig. 4. Nios II Application and BSP from Template.
 </p>
 
 *Note:* the file 'niosII.sopcinfo' provided in this repository in `dependencies/niosII/`
 works specifically with the FPGA (Stratix IV EP4SGX230KF40C2). If you want to
 use a different board, you will have to generate the Nios II processor by
-following this tutorial: [Generate your own Nios II processor](https://github.com/allegroCoder/fantasi/tree/documentation/doc#generate-your-own-nios-ii-processor).
+following this tutorial: [Generate your own Nios II processor](https://github.com/tuura/fantasi/tree/master/doc#generate-your-own-nios-ii-processor).
 
 * **2.** Once that you created the Eclipse projects, insert the file
 `nios-API.c`, provided inside the repository, inside the 'FANTASI'
@@ -282,7 +282,7 @@ board within the `Connections` section under this tab, if not, try to
 `Refresh connections`. Finally, click `Apply` and `Run`.
 
 <p align="center">
-  <img src="https://github.com/allegroCoder/fantasi/blob/documentation/doc/fig/nios-configurations.png" width="750" border="10"/></a><br>
+  <img src="https://github.com/tuura/fantasi/blob/master/doc/fig/nios-configurations.png" width="750" border="10"/></a><br>
   Fig. 5. Eclipse window 'Run Configurations'.
 </p>
 
