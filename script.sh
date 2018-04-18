@@ -13,9 +13,7 @@ function log2 {
 for var in "$@"
 do
     if [ $var = "-h" -o $var = "-help" -o $var = "--help" -o $var = "-H" ]; then
-        echo "This is a script for parsing a graph (XML format), converting it into"
-        echo "hardware, and synthesing it into an Altera FPGA board."
-        echo "Usage: $0 [graph] [pangraph-tool] [Quartus-project-dir]"
+        echo "Usage: $0 [graph] [fantasi-tool] [Top-level-entity]"
         exit 0
     fi
 done
@@ -34,27 +32,21 @@ if ! [ -e "$fantasi_tool" ] || ! [ -x "$fantasi_tool" ]; then
     exit 0
 fi
 
-# get Quartus project folder
-quartus_project_folder="/`realpath $3`"
-if ! [ -d "$quartus_project_folder" ]; then
-    echo "$3 is not a directory"
-    exit 0
-fi
-
-if ! [ -e "$quartus_project_folder/TOP.vhd" ]; then
-    echo "Top level entity not found in $3. It should be named TOP.vhd"
+# get top level entity path
+top_entity="/`realpath $3`"
+if ! [ -e "$top_entity" ]; then
+    echo "Top level entity does not exist in this path: $3"
     exit 0
 fi
 
 # generating vhdl files from the graph
 printf "Executing $fantasi_tool..."
-$fantasi_tool $graph_path -n $quartus_project_folder/graph.vhdl \
--s $quartus_project_folder/sim-environment.vhdl
+$fantasi_tool $graph_path -n graph.vhdl -s sim-environment.vhdl
 printf "done.\n"
 
 # modify top level entity to adapt the infrastructure to the graph
 printf "Generic map parameters substitution..."
-mv $quartus_project_folder/TOP.vhd $quartus_project_folder/TOP.vhd.bak
+mv $top_entity $top_entity.bak
 NODES=`cat $graph_path | grep "<node" | wc -l`
 ADDR_BITS=$(log2 $NODES)
 RESULT_BITS=$((($ADDR_BITS * 2) + 1))
@@ -67,5 +59,5 @@ awk -v nodes=$NODES -v result_bits=$RESULT_BITS -v addr_bits=$ADDR_BITS \
     else if ( $1 == "ADDR_SHIFT" && $4 == ":=" )
         printf("\t\tADDR_SHIFT : integer := %d);\n", addr_bits);
     else
-        print $0; }' $quartus_project_folder/TOP.vhd.bak > $quartus_project_folder/TOP.vhd
+        print $0; }' $top_entity.bak > $top_entity
 printf "done.\n"

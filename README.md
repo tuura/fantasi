@@ -1,5 +1,7 @@
 [![Build Status](https://travis-ci.org/tuura/fantasi.svg?branch=CI-travis)](https://travis-ci.org/tuura/fantasi)
 
+See [Documentation](https://github.com/tuura/fantasi/tree/master/doc).
+
 # fantasi
 `Fantasi` translates graphs from the GraphML format to VHDL, and also creates an infrastructure for their analysis. It relies on `pangraph` (https://github.com/tuura/pangraph.git) for the parsing of the GraphML files.
 
