@@ -2,18 +2,17 @@
 
 This tutorial guides the reader through the usage of the
 *FANTASI* (FAst NeTwork Analysis in SIlicon) hardware
-accelerator, developed during the EPSRC programme grant
-[POETS](https://poets-project.org/) in partnership with [e-Therapeutics
-PLC](https://www.etherapeutics.co.uk/). First, we say a few lines about the
+accelerator, developed in partnership with [e-Therapeutics
+PLC](https://www.etherapeutics.co.uk/). The work was funded
+by EPSRC Impact Acceleration Account and EPSRC programme grant
+[POETS](https://poets-project.org/). We start with the
 [motivation](https://github.com/tuura/fantasi/tree/master/doc#motivation)
-of the project, then we give an [architectural
-overview](https://github.com/tuura/fantasi/tree/master/doc#architectural-overview)
-of the accelerator, and finally we
-show how to build one and use it, see
+behind the project, then give an
+[architectural overview](https://github.com/tuura/fantasi/tree/master/doc#architectural-overview)
+of the accelerator, and finally we show how to build and use it, see
 [prerequisites](https://github.com/tuura/fantasi/tree/master/doc#prerequisites)
 and [building an accelerator](https://github.com/tuura/fantasi/tree/master/doc#building-an-accelerator-instance).
-You can jump to the section you're interested in by clicking on the
-above links.
+You can jump to the section you're interested in by clicking on the above links.
 
 ## Motivation
 
