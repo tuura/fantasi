@@ -200,11 +200,11 @@ a VHDL entity of the Nios II software processor. For simplicity, we provide
 all the dependencies (inside the `dependencies/` folder of the repository)
 needed to generate the FPGA bitstream of the FANTASI accelerator, including the
 top level entity (`TOP.vhdl`) where an instance of the Nios II processor is connected
-to the modules for the drug discovery analysis. The top entity file needs to be customised 
+to the modules for the drug discovery analysis. The top entity file needs to be customised
 according to the network that one wants to analyse (see next iteration).
 
 * **3.** Run the Bash script `script.sh` to generate the hardware network
-(output file: `graph.vhdl`, see Figure 2), the modules for the drug analysis 
+(output file: `graph.vhdl`, see Figure 2), the modules for the drug analysis
 (output file: `sim-environment.vhdl`, see Figure 3), and for modifying the top
 level entity of the whole HW design (named `dependencies/TOP.vhd`).
 
@@ -321,7 +321,7 @@ Commands:
   help                           Print help of the tool
 ```
 
-**Can you give me any examples?** 
+**Can you give me any examples?**
 * By running `start`, you will compute the average shortest path of the networks with all the nodes
 enabled.
 * With the command `test-drug 3 -- 10 60 99`, you will compute the
@@ -334,8 +334,54 @@ by the keyboard. The characters will still be recognised.
 
 ## Generate your own Nios II processor
 
-Work in progress...
-<!-- TODO: guide on how to generate the Nios II processor from within Quartus -->
+The above instructions have walked you through synthesizing an accelerator
+instance using the pre-built NIOS processor included in this repository. If
+you wish to synthesize and bundle your own NIOS processor (because you have
+difference performance requirements, require additional ports or else) then
+you can follow the steps below:
+
+NIOS processors can be generated using the _Qsys System Integration Tool_
+within Quartus (accessible through the _Tools_ menu). The accelerator requires
+a NIOS system with the following (minimum) set of components:
+
+| Name                        | Library component              | Instance Name | Parameters                 |
+|:----------------------------|:-------------------------------|:--------------|:---------------------------|
+| On-Chip Memory (RAM or ROM) | `altera_avalon_onchip_memory2` | -             | RAM (204800 bytes minimum) |
+| JTAG UART                   | `altera_avalon_jtag_uart`      | -             | -                          |
+| Clock Source                | `clock_source`                 | -             | -                          |
+| PIO (Parallel I/O)          | `altera_avalon_pio`            | `input0`      | 32-bits (inputs)           |
+| PIO (Parallel I/O)          | `altera_avalon_pio`            | `input1`      | 32-bits (inputs)           |
+| PIO (Parallel I/O)          | `altera_avalon_pio`            | `input2`      | 32-bits (inputs)           |
+| PIO (Parallel I/O)          | `altera_avalon_pio`            | `input3`      | 32-bits (inputs)           |
+| PIO (Parallel I/O)          | `altera_avalon_pio`            | `output0`     | 32-bits (outputs)          |
+| PIO (Parallel I/O)          | `altera_avalon_pio`            | `output1`     | 32-bits (outputs)          |
+| PIO (Parallel I/O)          | `altera_avalon_pio`            | `output2`     | 32-bits (outputs)          |
+| PIO (Parallel I/O)          | `altera_avalon_pio`            | `output3`     | 32-bits (outputs)          |
+| Nios II Processor           | `altera_nios2_gen2`            | -             | -                          |
+
+Blank fields under _Instance Name_ and _Parameters_ indicate don't cares and
+(default parameters, respectively.
+
+The connections between the modules above must be configured under in the
+_Connections_ column in the component list view. _Qsys_ will connect `clk` and
+`reset` pins automatically but you must ensure that the Nios processor's
+`data_master` and `instruction_master` ports (both of the type _Avalon Memory
+Mapped Master_) are connected to all ports with the type _Avalon Memory Mapped
+Slave_ in other modules.
+
+The repository contains a _Qsys_ system file
+[`niosII.qsys`](../dependencies/niosII/niosII.qsys) with the above
+configuration. This may be an easier starting point than putting the system
+together from scratch.
+
+After adding the various modules of the system and configuring their
+connections, regenerate base memory addresses by clicking the _System_ menu
+then _Assign Base Addresses_.
+
+The system should now be ready for synthesis. Press _Generate HDL..._ then
+_Generate_ on the following dialog. _Qsys_ will then generate a NIOS system
+with 4 inputs and 4 output ports that you can integrate into the accelerator's
+HDL source code.
 
 ## Basic references
 
