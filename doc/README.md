@@ -14,11 +14,25 @@ of the accelerator, and finally we show how to build and use it, see
 and [building an accelerator](https://github.com/tuura/fantasi/tree/master/doc#building-an-accelerator-instance).
 You can jump to the section you're interested in by clicking on the above links.
 
+This project participated to the _Xilinx Open Hardware competition 2018_, for which
+we made a video for presenting the project, see below.
+
+<p align="center">
+  <a href="http://www.youtube.com/watch?feature=player_embedded&v=Z2w0hiHY3Us" target="_blank">
+  <img src="http://img.youtube.com/vi/Z2w0hiHY3Us/0.jpg" alt="WATCH ME" width="480" height="360" border="10"/></a><br>
+  The YouTube video of the FANTASI project. Click on the figure to play it!
+</p>
+
+We prototyped the accelerator on the _Altera DE4_ and _Xilinx Virtex7_ boards. This
+tutorial also guides the reader through the synthesis of a complete instance of the
+accelerator on these two boards.
+
 ## Motivation
 
 This project is motivated by the area of *computational drug discovery*. In
 this area, biological systems are modelled by protein-protein interaction (PPI)
-networks [[1]](https://github.com/tuura/fantasi/tree/master/doc#basic-references) (large-scale graphs), which are analysed for collecting statistics
+networks [[1]](https://github.com/tuura/fantasi/tree/master/doc#basic-references) (large-scale graphs),
+which are analysed for collecting statistics
 and information that are used in pharmacological laboratories for a more
 effective discovery of drugs. Watch the below video to have a deeper insight
 of the drug discovery process, pionereed by *e-Therapeutics PLC*.
@@ -26,7 +40,7 @@ of the drug discovery process, pionereed by *e-Therapeutics PLC*.
 <p align="center">
   <a href="http://www.youtube.com/watch?feature=player_embedded&v=wQFpTtuzrgA" target="_blank">
   <img src="http://img.youtube.com/vi/wQFpTtuzrgA/0.jpg" alt="WATCH ME" width="480" height="360" border="10"/></a><br>
-  The YouTube video of the drug discovery process. Click the image to play it!
+  The YouTube video of the drug discovery process. Click on the figure to play it!
 </p>
 
 Conventional computer architectures cannot process such large graphs
@@ -88,7 +102,8 @@ between flip-flops, we OR the outputs of all vertex neighbours and use
 it as an input to the vertex flip-flop. For further details, refer to
 [[2]](https://github.com/tuura/fantasi/tree/master/doc#basic-references).
 
-Figure 3, in turn, shows an high-level view of the FANTASI infrastructure. The
+Figure 3, in turn, shows an high-level view of the FANTASI infrastructure (on one of
+the board that we used: Altera DE4). The
 digital circuit of the application network is at the core of the
 accelerator, highlighted with a red dashed line. The *hardware graph*
 is encapsulated by the control circuitry to enable/disable selected nodes,
@@ -105,11 +120,12 @@ resynthesis. Each configuration is identified by a set of nodes that are disable
   Fig. 3. The FANTASI hardware accelerator infrastructure.
 </p>
 
-For our experiments, we used the *Altera DE4 board* that integrates the
-*Stratix IV FPGA*. The host computer connects to the boards via a USB cable
+For our experiments, we used the *Altera DE4* and the *Xilinx Virtex 7* boards.
+The host computer connects to the boards via a USB cable
 that uses the JTAG UART interface. This is used for downloading the C code to
-the NIOS II soft-processor, which provides the API for graph processing. The
-host computer, instead, interfaces with the user of the FANTASI accelerator.
+the soft-processor (NIOS II and Microblaze, respectively), which provides the API
+for graph processing. The host computer, instead, interfaces with the user of the
+FANTASI accelerator.
 
 ## Prerequisites
 
@@ -145,7 +161,8 @@ Usage: fantasi [graphml file]
   -v           --version              Show version of Fantasi
 ```
 
-To use the FANTASI hardware accelerator, on the other hand, you will need the following:
+We tested the FANTASI accelerator on an Altera and a Xilinx boards. To use the
+accelerator using the Altera tool-chain and hardware, you will need the following:
 
 * **An Altera FPGA board** - in our experiments, we used the Altera DE4
 board that embeds the Stratix IV FPGA (EP4SGX230KF40C2). However, any FPGA by
@@ -164,7 +181,22 @@ the NIOS II is a software processor that can be synthesised in any Altera
 FPGA. The development kit available with Quartus can be used to customise
 and synthesise the processor into the FPGA.
 
-For more information about how to install the above tool, refer to the official
+On the other hand, to use the accelerator on a Xilinx board, you will need:
+
+* **A Xilinx FPGA board** - in our experiments, we used the Xilinx Virtex 7
+board. However, any FPGA by Xilinx can be used.
+
+* [**Xilinx Vivado**](https://www.xilinx.com/support/download.html) - the
+Xilinx design environment for the usage of any Xilinx FPGA board. We
+suggest to download the latest version of the software currently available. A license
+is required for the usage of the latest and bigger FPGA, such as the one that we used.
+In our experiments, we used the Vivado 2018.1.
+
+* [**Xilinx SDSoC**](https://www.xilinx.com/support/download.html) - This is the
+software development kit to develop, compile, and upload software in the Xilinx
+Microblaze processor, which is used for controlling the FANTASI accelerator.
+
+For more information on how to install the above tools, refer to the official
 documentation.
 
 ## Building an accelerator instance
@@ -195,7 +227,7 @@ the network for analysis. As an example, the application network in Figure
 </graphml>
 ```
 
-* **2.** The Nios development kit can be used from within Quartus to generate
+* **2.(Altera)** The Nios development kit can be used from within Quartus to generate
 a VHDL entity of the Nios II software processor. For simplicity, we provide
 all the dependencies (inside the `dependencies/` folder of the repository)
 needed to generate the FPGA bitstream of the FANTASI accelerator, including the
@@ -203,7 +235,18 @@ top level entity (`TOP.vhdl`) where an instance of the Nios II processor is conn
 to the modules for the drug discovery analysis. The top entity file needs to be customised
 according to the network that one wants to analyse (see next iteration).
 
-* **3.** Run the Bash script `script.sh` to generate the hardware network
+* **2.(Xilinx)** The Xilinx Vivado tool can be used to generate the VHDL entity of
+the Microblaze software processor, and for all the modules needed for the communication
+between the host computer, the soft processor and the accelerator. We provide the file
+[`top.vhd`](../dependencies/Xilinx_virtex7/top.vhd) as example of all modules needed
+for the accelerator to function correctly. We suggest the reader to watch this
+[video](https://www.youtube.com/results?search_query=vivado+microblaze+tutorial)
+in order to learn how to use the Vivado tool, synthesise an instance of the 
+Microblaze processor, and upload software on it using the Eclipse SDK.
+*Note:* we suggest to instantiate the maximum amount of memory for the Microblaze
+processor (128KB), as we will fully use it with our API.
+
+* **3.** Run the Bash script [`script.sh`](../script.sh) to generate the hardware network
 (output file: `graph.vhdl`, see Figure 2), the modules for the drug analysis
 (output file: `sim-environment.vhdl`, see Figure 3), and for modifying the top
 level entity of the whole HW design (named `dependencies/TOP.vhd`).
@@ -212,7 +255,7 @@ level entity of the whole HW design (named `dependencies/TOP.vhd`).
 ./script.sh [graphml file] [fantasi tool] [top level VHDL entity]
 ```
 
-* **4.** Create a new project in Quartus and select the FPGA that
+* **4.(Altera)** Create a new project in Quartus and select the FPGA that
 you want to use. In this tutorial, we assume the usage of the Stratix IV FPGA
 (EP4SGX230KF40C2), so that to enjoy the ready-to-use Nios II processor instance
 in `dependencies/`. Afterwards, import the generated files (`graph.vhdl` and
@@ -222,9 +265,18 @@ file `TOP.vhd` as top level entity of the project. **Note:** in order to import
 the Nios II processor and the pll module, you need to import into quartus the
 files with extension `.qip`, which can be found in the corresponding folders.
 
-* **5.** Run the compilation process in Quartus, and then program the
+* **4.(Xilinx)** If you followed the step 2 (Xilinx). You will now have a working
+instance of the Microblaze processor. All you need to do now is importing the files
+[`FSM.vhdl`](../dependencies/FSM.vhdl) and [`FSM-enable-nodes.vhdl`](../dependencies/FSM-enable-nodes.vhd)
+and their dependencies using the IP integrator, and size the input/output of the GPIOs using the Xilinx
+IPs named _slice_ and _concat_ to connect the accelerator to the software processor.
+
+* **5.(Altera)** Run the compilation process in Quartus, and then program the
 generated bistream file into the FPGA. The expected compilation time for a network
 composed of about 1k nodes is of 20 minutes.
+
+* **5.(Xilinx)** Generate the bitstream in Vivado, and then launch the SDK in order
+to be able to upload the bitstream into the board.
 
 As a result, the FANTASI accelerator should be mapped onto the FPGA.
 
@@ -290,6 +342,16 @@ plugin GUI will display the console of the Nios II processor in the `Console`
 section. Read through the next section for some instructions on how to use
 the accelerator.
 
+### Downloading Microblaze Software
+
+The steps that need to be performed in the Xilinx SDK are similar to the ones followed
+for using the Altera NIOS II software processor. Again, we refer the reader to this
+[video](https://www.youtube.com/results?search_query=vivado+microblaze+tutorial),
+for learning how to use the Xilinx SDSoC and upload software into the Microblaze.
+
+The API for using the FANTASI accelerator via this processor is provided, see
+[`microblaze-API.c`](../microblaze-API.c).
+
 ## Using the accelerator
 
 **How to run commands on the FANTASI API?** At this point, the Nios II
@@ -321,14 +383,19 @@ Commands:
   help                           Print help of the tool
 ```
 
-**Can you give me any examples?**
+The Microblaze API contains lees functions. This is because the amount of local memory
+of the processor does not allow to use many functions of the C std library (such as the scanf).
+However, one can easily connect the Microblaze processor to an external DRAM memory in
+order to extend the API.
+
+**Examples**
 * By running `start`, you will compute the average shortest path of the networks with all the nodes
 enabled.
 * With the command `test-drug 3 -- 10 60 99`, you will compute the
 average shortest path (and the impact on the resilience of the network)
 with the nodes with indices {10, 60, 99} are disabled.
 
-**Any known issues?**
+**Known issues**
 * The `nios2-terminal` tool, in linux, does not display the characters introduced
 by the keyboard. The characters will still be recognised.
 
@@ -370,7 +437,7 @@ Mapped Master_) are connected to all ports with the type _Avalon Memory Mapped
 Slave_ in other modules.
 
 The repository contains a _Qsys_ system file
-[`niosII.qsys`](../dependencies/niosII/niosII.qsys) with the above
+[`niosII.qsys`](../dependencies/Alterta_DE4/niosII/niosII.qsys) with the above
 configuration. This may be an easier starting point than putting the system
 together from scratch.
 
@@ -382,6 +449,7 @@ The system should now be ready for synthesis. Press _Generate HDL..._ then
 _Generate_ on the following dialog. _Qsys_ will then generate a NIOS system
 with 4 inputs and 4 output ports that you can integrate into the accelerator's
 HDL source code.
+
 
 ## Basic references
 
