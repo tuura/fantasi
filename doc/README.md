@@ -14,11 +14,25 @@ of the accelerator, and finally we show how to build and use it, see
 and [building an accelerator](https://github.com/tuura/fantasi/tree/master/doc#building-an-accelerator-instance).
 You can jump to the section you're interested in by clicking on the above links.
 
+This project participated to the _Xilinx Open Hardware competition 2018_, for which
+we made a video for presenting the project, see below.
+
+<p align="center">
+  <a href="http://www.youtube.com/watch?feature=player_embedded&v=Z2w0hiHY3Us" target="_blank">
+  <img src="http://img.youtube.com/vi/Z2w0hiHY3Us/0.jpg" alt="WATCH ME" width="480" height="360" border="10"/></a><br>
+  The YouTube video of the FANTASI project. Click on the figure to play it!
+</p>
+
+We prototyped the accelerator on the _Altera DE4_ and _Xilinx Virtex7_ boards. This
+tutorial also guides the reader through the synthesis of a complete instance of the
+accelerator on these two boards.
+
 ## Motivation
 
 This project is motivated by the area of *computational drug discovery*. In
 this area, biological systems are modelled by protein-protein interaction (PPI)
-networks [[1]](https://github.com/tuura/fantasi/tree/master/doc#basic-references) (large-scale graphs), which are analysed for collecting statistics
+networks [[1]](https://github.com/tuura/fantasi/tree/master/doc#basic-references) (large-scale graphs),
+which are analysed for collecting statistics
 and information that are used in pharmacological laboratories for a more
 effective discovery of drugs. Watch the below video to have a deeper insight
 of the drug discovery process, pionereed by *e-Therapeutics PLC*.
@@ -26,7 +40,7 @@ of the drug discovery process, pionereed by *e-Therapeutics PLC*.
 <p align="center">
   <a href="http://www.youtube.com/watch?feature=player_embedded&v=wQFpTtuzrgA" target="_blank">
   <img src="http://img.youtube.com/vi/wQFpTtuzrgA/0.jpg" alt="WATCH ME" width="480" height="360" border="10"/></a><br>
-  The YouTube video of the drug discovery process. Click the image to play it!
+  The YouTube video of the drug discovery process. Click on the figure to play it!
 </p>
 
 Conventional computer architectures cannot process such large graphs
@@ -88,7 +102,8 @@ between flip-flops, we OR the outputs of all vertex neighbours and use
 it as an input to the vertex flip-flop. For further details, refer to
 [[2]](https://github.com/tuura/fantasi/tree/master/doc#basic-references).
 
-Figure 3, in turn, shows an high-level view of the FANTASI infrastructure. The
+Figure 3, in turn, shows an high-level view of the FANTASI infrastructure (on one of
+the board that we used: Altera DE4). The
 digital circuit of the application network is at the core of the
 accelerator, highlighted with a red dashed line. The *hardware graph*
 is encapsulated by the control circuitry to enable/disable selected nodes,
@@ -105,11 +120,12 @@ resynthesis. Each configuration is identified by a set of nodes that are disable
   Fig. 3. The FANTASI hardware accelerator infrastructure.
 </p>
 
-For our experiments, we used the *Altera DE4 board* that integrates the
-*Stratix IV FPGA*. The host computer connects to the boards via a USB cable
+For our experiments, we used the *Altera DE4* and the *Xilinx Virtex 7* boards.
+The host computer connects to the boards via a USB cable
 that uses the JTAG UART interface. This is used for downloading the C code to
-the NIOS II soft-processor, which provides the API for graph processing. The
-host computer, instead, interfaces with the user of the FANTASI accelerator.
+the soft-processor (NIOS II and Microblaze, respectively), which provides the API
+for graph processing. The host computer, instead, interfaces with the user of the
+FANTASI accelerator.
 
 ## Prerequisites
 
@@ -145,7 +161,8 @@ Usage: fantasi [graphml file]
   -v           --version              Show version of Fantasi
 ```
 
-To use the FANTASI hardware accelerator, on the other hand, you will need the following:
+We tested the FANTASI accelerator on an Altera and a Xilinx boards. To use the
+accelerator using the Altera tool-chain and hardware, you will need the following:
 
 * **An Altera FPGA board** - in our experiments, we used the Altera DE4
 board that embeds the Stratix IV FPGA (EP4SGX230KF40C2). However, any FPGA by
@@ -164,7 +181,22 @@ the NIOS II is a software processor that can be synthesised in any Altera
 FPGA. The development kit available with Quartus can be used to customise
 and synthesise the processor into the FPGA.
 
-For more information about how to install the above tool, refer to the official
+On the other hand, to use the accelerator on a Xilinx board, you will need:
+
+* **A Xilinx FPGA board** - in our experiments, we used the Xilinx Virtex 7
+board. However, any FPGA by Xilinx can be used.
+
+* [**Xilinx Vivado**](https://www.xilinx.com/support/download.html) - the
+Xilinx design environment for the usage of any Xilinx FPGA board. We
+suggest to download the latest version of the software currently available. A license
+is required for the usage of the latest and bigger FPGA, such as the one that we used.
+In our experiments, we used the Vivado 2018.1.
+
+* [**Xilinx SDSoC**](https://www.xilinx.com/support/download.html) - This is the
+software development kit to develop, compile, and upload software in the Xilinx
+Microblaze processor, which is used for controlling the FANTASI accelerator.
+
+For more information on how to install the above tools, refer to the official
 documentation.
 
 ## Building an accelerator instance
@@ -321,14 +353,14 @@ Commands:
   help                           Print help of the tool
 ```
 
-**Can you give me any examples?**
+**Examples**
 * By running `start`, you will compute the average shortest path of the networks with all the nodes
 enabled.
 * With the command `test-drug 3 -- 10 60 99`, you will compute the
 average shortest path (and the impact on the resilience of the network)
 with the nodes with indices {10, 60, 99} are disabled.
 
-**Any known issues?**
+**Known issues**
 * The `nios2-terminal` tool, in linux, does not display the characters introduced
 by the keyboard. The characters will still be recognised.
 
@@ -370,7 +402,7 @@ Mapped Master_) are connected to all ports with the type _Avalon Memory Mapped
 Slave_ in other modules.
 
 The repository contains a _Qsys_ system file
-[`niosII.qsys`](../dependencies/niosII/niosII.qsys) with the above
+[`niosII.qsys`](../dependencies/Alterta_DE4/niosII/niosII.qsys) with the above
 configuration. This may be an easier starting point than putting the system
 together from scratch.
 
