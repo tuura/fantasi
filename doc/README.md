@@ -227,7 +227,7 @@ the network for analysis. As an example, the application network in Figure
 </graphml>
 ```
 
-* **2.** The Nios development kit can be used from within Quartus to generate
+* **2.(Altera)** The Nios development kit can be used from within Quartus to generate
 a VHDL entity of the Nios II software processor. For simplicity, we provide
 all the dependencies (inside the `dependencies/` folder of the repository)
 needed to generate the FPGA bitstream of the FANTASI accelerator, including the
@@ -235,7 +235,18 @@ top level entity (`TOP.vhdl`) where an instance of the Nios II processor is conn
 to the modules for the drug discovery analysis. The top entity file needs to be customised
 according to the network that one wants to analyse (see next iteration).
 
-* **3.** Run the Bash script `script.sh` to generate the hardware network
+* **2.(Xilinx)** The Xilinx Vivado tool can be used to generate the VHDL entity of
+the Microblaze software processor, and for all the modules needed for the communication
+between the host computer, the soft processor and the accelerator. We provide the file
+[`top.vhd`](../dependencies/Xilinx_virtex7/top.vhd) as example of all modules needed
+for the accelerator to function correctly. We suggest the reader to watch this
+[video](https://www.youtube.com/results?search_query=vivado+microblaze+tutorial)
+in order to learn how to use the Vivado tool, synthesise an instance of the 
+Microblaze processor, and upload software on it using the Eclipse SDK.
+*Note:* we suggest to instantiate the maximum amount of memory for the Microblaze
+processor (128KB), as we will fully use it with our API.
+
+* **3.** Run the Bash script [`script.sh`](../script.sh) to generate the hardware network
 (output file: `graph.vhdl`, see Figure 2), the modules for the drug analysis
 (output file: `sim-environment.vhdl`, see Figure 3), and for modifying the top
 level entity of the whole HW design (named `dependencies/TOP.vhd`).
@@ -244,7 +255,7 @@ level entity of the whole HW design (named `dependencies/TOP.vhd`).
 ./script.sh [graphml file] [fantasi tool] [top level VHDL entity]
 ```
 
-* **4.** Create a new project in Quartus and select the FPGA that
+* **4.(Altera)** Create a new project in Quartus and select the FPGA that
 you want to use. In this tutorial, we assume the usage of the Stratix IV FPGA
 (EP4SGX230KF40C2), so that to enjoy the ready-to-use Nios II processor instance
 in `dependencies/`. Afterwards, import the generated files (`graph.vhdl` and
@@ -254,9 +265,18 @@ file `TOP.vhd` as top level entity of the project. **Note:** in order to import
 the Nios II processor and the pll module, you need to import into quartus the
 files with extension `.qip`, which can be found in the corresponding folders.
 
-* **5.** Run the compilation process in Quartus, and then program the
+* **4.(Xilinx)** If you followed the step 2 (Xilinx). You will now have a working
+instance of the Microblaze processor. All you need to do now is importing the files
+[`FSM.vhdl`](../dependencies/FSM.vhdl) and [`FSM-enable-nodes.vhdl`](../dependencies/FSM-enable-nodes.vhd)
+and their dependencies using the IP integrator, and size the input/output of the GPIOs using the Xilinx
+IPs named _slice_ and _concat_ to connect the accelerator to the software processor.
+
+* **5.(Altera)** Run the compilation process in Quartus, and then program the
 generated bistream file into the FPGA. The expected compilation time for a network
 composed of about 1k nodes is of 20 minutes.
+
+* **5.(Xilinx)** Generate the bitstream in Vivado, and then launch the SDK in order
+to be able to upload the bitstream into the board.
 
 As a result, the FANTASI accelerator should be mapped onto the FPGA.
 
@@ -322,6 +342,16 @@ plugin GUI will display the console of the Nios II processor in the `Console`
 section. Read through the next section for some instructions on how to use
 the accelerator.
 
+### Downloading Microblaze Software
+
+The steps that need to be performed in the Xilinx SDK are similar to the ones followed
+for using the Altera NIOS II software processor. Again, we refer the reader to this
+[video](https://www.youtube.com/results?search_query=vivado+microblaze+tutorial),
+for learning how to use the Xilinx SDSoC and upload software into the Microblaze.
+
+The API for using the FANTASI accelerator via this processor is provided, see
+[`microblaze-API.c`](../microblaze-API.c).
+
 ## Using the accelerator
 
 **How to run commands on the FANTASI API?** At this point, the Nios II
@@ -352,6 +382,11 @@ Commands:
   stat                           Print number of nodes of the network
   help                           Print help of the tool
 ```
+
+The Microblaze API contains lees functions. This is because the amount of local memory
+of the processor does not allow to use many functions of the C std library (such as the scanf).
+However, one can easily connect the Microblaze processor to an external DRAM memory in
+order to extend the API.
 
 **Examples**
 * By running `start`, you will compute the average shortest path of the networks with all the nodes
@@ -414,6 +449,7 @@ The system should now be ready for synthesis. Press _Generate HDL..._ then
 _Generate_ on the following dialog. _Qsys_ will then generate a NIOS system
 with 4 inputs and 4 output ports that you can integrate into the accelerator's
 HDL source code.
+
 
 ## Basic references
 
