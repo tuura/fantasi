@@ -43,6 +43,8 @@ void growing_set(int, int);
 void brute_force(int);
 int get_number_nodes();
 
+#include "ga.c"
+
 int main() {
 
 	int lim, nd;
@@ -55,6 +57,9 @@ int main() {
 	network = (int*) malloc(sizeof(int) * nodes);
 
 	print_help();
+
+	init_ga_pop(20, 10);
+	show_ga_pop();
 
 	while (1) {
 
@@ -224,6 +229,29 @@ int main() {
 
 			continue;
 
+		}
+
+		if (str_starts_with(cmd, "ga init")) {
+
+			int psize;  // population size
+			int isize;  // individual size
+
+			sscanf(cmd, "ga init %d %d", &psize, &isize);
+
+			init_ga_pop(psize, isize);
+			continue;
+		}
+
+		if (str_starts_with(cmd, "ga show")) {
+
+			show_ga_pop();
+			continue;
+		}
+
+		if (str_starts_with(cmd, "ga best")) {
+
+			printf("Best fitness: %f\n", get_ga_best(nodes));
+			continue;
 		}
 
 		printf("Unrecognized command \n");
@@ -504,6 +532,8 @@ void print_help() {
 		"  sweep rand <from> <to> <n>  Compute <n> ASP with [<from>, <to>] nodes removed.",
 		"  sweep grow <to> <n>         Compute <n> ASP with [1, <to>] nodes removed.",
 		"  sweep max <to>              Compute max ASP for [1, <to>] removes nodes.",
+		"  ga init <n> <nodes>         Initialize population of <n> individuals.",
+		"  ga show                     Print population table.",
 		"  result                      Display the result.",
 		"  reset                       Reset network and result/shift registers.",
 		"  stat                        Print node count.",
