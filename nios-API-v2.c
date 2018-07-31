@@ -85,8 +85,8 @@ int main() {
 
 		}
 
-		// Run a drug-based analysis
-		if (str_starts_with(cmd, "test-drug")) {
+		// Compute ASP with some nodes disabled
+		if (str_starts_with(cmd, "disable")) {
 
 			float avg;
 			int sp;
@@ -94,7 +94,7 @@ int main() {
 			int n;
 			int numchar = 0, num = 0;
 
-			sscanf(cmd, "test-drug %d --%n", &n, &numchar);
+			sscanf(cmd, "disable %d %n", &n, &numchar);
 
 			if (n < 1) continue;
 
@@ -119,27 +119,27 @@ int main() {
 		}
 
 		// random set analysis
-		if (str_starts_with(cmd, "random-set")) {
+		if (str_starts_with(cmd, "sweep rand")) {
 
-			sscanf(cmd, "random-set %d %d %d", &from, &to, &n_sim);
+			sscanf(cmd, "sweep rand %d %d %d", &from, &to, &n_sim);
 
 			random_set(from, to, n_sim);
 			continue;
 		}
 
 		// growing set analysis
-		if (str_starts_with(cmd, "growing-set")) {
+		if (str_starts_with(cmd, "sweep grow")) {
 
-			sscanf(cmd, "growing-set %d %d", &to, &n_sim);
+			sscanf(cmd, "sweep grow %d %d", &to, &n_sim);
 
 			growing_set(to, n_sim);
 			continue;
 		}
 
 		// brute-force analysis
-		if (str_starts_with(cmd, "force")) {
+		if (str_starts_with(cmd, "sweep max")) {
 
-			sscanf(cmd, "force %d", &to);
+			sscanf(cmd, "sweep max %d", &to);
 
 			brute_force(to);
 			continue;
@@ -492,32 +492,33 @@ void custom_random_analysis(int lim, int nd) {
 
 // helper functions
 void print_help() {
-	printf("FANTASI Terminal Ver 1.0\n");
-	printf("Number of nodes: %d\n\n", nodes);
-	printf("Commands:\n");
-	printf("  start\t\t\t");
-	printf("Run 1 simulation with all the nodes enabled\n");
-	printf("  test-drug 'n' -- [off nodes]\t");
-	printf("Run a simulation with the following 'n' nodes disabled in the form of '5 100 1 305'\n");
-	printf("\t\t\tExample: test-drug 3 -- 5 10 946\n");
-	printf("  random 'n' 'm'\t\t");
-	printf("Run 'n' simulations, removing 'm' random nodes at every run\n");
-	printf("  random-set 'from' 'to' 'n'\t");
-	printf("Remove 'n' independently chosen sets of size k, for k = 'from' .. 'to'\n");
-	printf("  growing-set 'to' 'n'\t");
-	printf("Remove 'n' growing sets of size k, for k = 1 .. 'to', starting\n");
-	printf("\t\t\twith fixed random permutations as seeds for the growing sets\n");
-	printf("  force 'to'\t\t");
-	printf("Remove sets of size k, for k = 1 .. 'to', where each node added into the\n");
-	printf("\t\t\tset maximises the impact of the network\n");
-	printf("  result\t\t\t");
-	printf("Display the result\n");
-	printf("  reset\t\t\t");
-	printf("Reset the network, the register that contain the result, and the shift register\n");
-	printf("  stat\t\t\t");
-	printf("Print number of nodes of the network\n");
-	printf("  help\t\t\t");
-	printf("Print help of the tool\n");
+
+	char usage[][96] = {
+		"FANTASI Terminal Ver 2.0",
+		"",
+		"Commands:",
+		"",
+		"  start                       Compute network Average Shortest Path (ASP).",
+		"  disable <n> <nodes>         Compute ASP with <n> disabled <nodes>.",
+		"  random <n> <m>              Compute <n> ASP with <m> random nodes removed.",
+		"  sweep rand <from> <to> <n>  Compute <n> ASP with [<from>, <to>] nodes removed.",
+		"  sweep grow <to> <n>         Compute <n> ASP with [1, <to>] nodes removed.",
+		"  sweep max <to>              Compute max ASP for [1, <to>] removes nodes.",
+		"  result                      Display the result.",
+		"  reset                       Reset network and result/shift registers.",
+		"  stat                        Print node count.",
+		"  help                        Print command help.",
+		"",
+		"Examples:",
+		"",
+		"  disable 3 5 10 946          Compute ASP with 3 nodes removed: 5, 10 and 946",
+	};
+
+	size_t nlines = sizeof(usage) / sizeof(usage[0]);
+
+	for (int i=0; i<nlines; i++)
+		printf("%s\n", usage[i]);
+
 }
 
 short str_starts_with(char *str1, const char *str2) {
