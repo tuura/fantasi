@@ -58,8 +58,12 @@ int main() {
 
 	print_help();
 
-	init_ga_pop(20, 10);
+	init_ga(20, 10);
+	create_ga_population();
+	qsort_pop();
 	show_ga_pop();
+	// mate(0, 1);
+	// show_ga_pop();
 
 	while (1) {
 
@@ -238,7 +242,8 @@ int main() {
 
 			sscanf(cmd, "ga init %d %d", &psize, &isize);
 
-			init_ga_pop(psize, isize);
+			init_ga(psize, isize);
+			create_ga_population();
 			continue;
 		}
 
