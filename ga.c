@@ -14,6 +14,12 @@ struct individual *pop; // population
 
 int *disabled_nodes;
 
+char* temp1;
+char* temp2;
+
+struct individual child1;
+struct individual child2;
+
 // functions
 
 void init_ga(int psize, int isize) {
@@ -28,6 +34,37 @@ void init_ga(int psize, int isize) {
 
 	disabled_nodes = (int*) malloc(sizeof(int) * ind_size);
 
+	temp1 = (char*) malloc(sizeof(char) * nodes);
+	temp2 = (char*) malloc(sizeof(char) * nodes);
+
+	child1.disabled = malloc(sizeof(node_t) * ind_size);
+	child2.disabled = malloc(sizeof(node_t) * ind_size);
+
+}
+
+// for quick sort
+int comp_nodes (const void * a, const void * b) {
+   return ( *(node_t*)b - *(node_t*)a );
+}
+
+
+float _eval_ind(struct individual ind) {
+
+	// Evaluate individual.
+
+	reset_network();
+
+	for (int i=0; i<ind_size; i++) disabled_nodes[i] = ind.disabled[i];
+
+	qsort(disabled_nodes, ind_size, sizeof(int), cmpfunc);
+
+	turnoff_nodes(disabled_nodes, ind_size);
+
+	start_test();
+
+	int sp = read_result();
+
+	return avg_path(sp, ind_size);
 }
 
 void create_ga_population() {
@@ -55,44 +92,20 @@ void create_ga_population() {
 
 		for (int j=0; j< ind_size; j++)
 			pop[i].disabled[j] = rand() % nodes;
+
+		pop[i].fitness = _eval_ind(pop[i]);
+
+		qsort(pop[i].disabled, ind_size, sizeof(node_t), comp_nodes);
+
 	}
 
 	printf("Created %d individuals of %d nodes each.\n", pop_size, ind_size);
 }
 
-float _eval_ind(struct individual ind) {
-
-	// Evaluate individual.
-
-	reset_network();
-
-	// int *disabled_nodes = (int*) malloc(sizeof(int) * ind_size);
-
-	for (int i=0; i<ind_size; i++) disabled_nodes[i] = ind.disabled[i];
-
-	qsort(disabled_nodes, ind_size, sizeof(int), cmpfunc);
-
-	turnoff_nodes(disabled_nodes, ind_size);
-
-	// free(disabled_nodes);
-
-	start_test();
-
-	int sp = read_result();
-
-	return avg_path(sp, ind_size);
-}
-
-void eval_population() {
-
-	for (int i=0; i<pop_size; i++) pop[i].fitness = _eval_ind(pop[i]);
-}
 
 void show_ga_pop() {
 
 	// Print population table.
-
-	eval_population();
 
 	printf("Population: %d individuals of %d nodes each.\n\n", pop_size, ind_size);
 
@@ -109,8 +122,6 @@ void show_ga_pop() {
 float get_ga_best() {
 
 	// Return fitness of best individual.
-
-	eval_population();
 
 	float best_fitness = pop[0].fitness;
 
@@ -183,5 +194,81 @@ int compete(float p) {
 	int winner = rand_float < p ? fittest : weakest;
 
 	return winner;
+
+}
+
+// void step() {
+
+// 	float p = 0.7;  // selection parameter
+
+// 	int p1 = compete(p);
+// 	int p2 = compete(p);
+
+// }
+
+void crossover(struct individual p1, struct individual p2) {
+
+	// Subperformant crossover of two parents.
+
+	// Uncompress parent disabled nodes into bit vectors.
+
+	for (int i=0; i<nodes; i++) {
+		temp1[i] = 0;
+		temp2[i] = 0;
+	}
+
+	for (int i=0; i<ind_size; i++) {
+
+		temp1[p1.disabled[i]] = 1;
+		temp2[p2.disabled[i]] = 1;
+	}
+
+	// Scan through bitvectors and add nodes to children.
+
+	int nc1 = 0; // number of nodes in child1
+	int nc2 = 0; // number of nodes in child2
+
+	for (int i=0; i<nodes; i++) {
+
+		if (temp1[i] && temp2[i]) {
+
+			child1.disabled[nc1++] = i;
+			child2.disabled[nc2++] = i;
+
+		} else if (temp1[i] || temp2[i]) {
+
+			if (nc1 < nc2)
+				child1.disabled[nc1++] = i;
+			else
+				child2.disabled[nc2++] = i;
+
+		}
+
+	}
+
+	printf("nc1 = %d\n", nc1);
+	printf("nc2 = %d\n", nc2);
+
+	// Evaluate fitness of children.
+
+	qsort(child1.disabled, ind_size, sizeof(node_t), comp_nodes);
+	qsort(child2.disabled, ind_size, sizeof(node_t), comp_nodes);
+
+	child1.fitness = _eval_ind(child1);
+	child2.fitness = _eval_ind(child2);
+
+	// Print children.
+
+	printf("Child 1 (fitness %f):", child1.fitness);
+
+	for (int j=0; j<ind_size; j++) printf("  %4d", child1.disabled[j]);
+
+	printf("\n");
+
+	printf("Child 2 (fitness %f):", child2.fitness);
+
+	for (int j=0; j<ind_size; j++) printf("  %4d", child2.disabled[j]);
+
+	printf("\n");
 
 }

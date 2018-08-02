@@ -56,12 +56,13 @@ int main() {
 	nodes = get_number_nodes();
 	network = (int*) malloc(sizeof(int) * nodes);
 
-	print_help();
+	// print_help();
 
-	init_ga(20, 10);
+	init_ga(20, 20);
 	create_ga_population();
 	qsort_pop();
 	show_ga_pop();
+	crossover(pop[0], pop[1]);
 	// mate(0, 1);
 	// show_ga_pop();
 
