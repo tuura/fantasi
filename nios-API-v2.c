@@ -58,11 +58,18 @@ int main() {
 
 	// print_help();
 
-	init_ga(20, 20);
-	create_ga_population();
-	qsort_pop();
+	// init_ga(100, 5);
+	// create_ga_population();
+	// qsort_pop();
+	// step(1000);
+
 	show_ga_pop();
-	crossover(pop[0], pop[1]);
+
+	// while(1);
+
+	// crossover_etx(pop[0], pop[1]);
+	// crossover_shuffle(pop + 0, pop + 1);
+	// show_ga_pop();
 	// mate(0, 1);
 	// show_ga_pop();
 
@@ -94,6 +101,53 @@ int main() {
 			continue;
 
 		}
+
+		if (str_starts_with(cmd, "d3")) {
+
+				init_ga(50, 400);
+				create_ga_population();
+				qsort_pop();
+				step(10);
+				continue;
+
+		}
+
+		if (str_starts_with(cmd, "debug2")) {
+
+				init_ga(10, 1400);
+				create_ga_population();
+				qsort_pop();
+				step(1000);
+				continue;
+
+		}
+
+
+		if (str_starts_with(cmd, "debug1")) {
+
+			// sscanf(cmd, "t1 %d", &n);
+
+			for (int n=0; n<1800; n += 50) {
+
+				init_ga(1, n);
+				create_ga_population();
+				qsort_pop();
+
+				float min = get_ga_min();
+				float max = get_ga_max();
+				float mean_2 = get_ga_mean();
+
+				printf("n = %3d, [min = %f, max = %f, first = %f]\n", n, min, max, pop[0].fitness);
+
+				// step(1000);
+
+			}
+
+			continue;
+
+		}
+
+
 
 		// Compute ASP with some nodes disabled
 		if (str_starts_with(cmd, "disable")) {
