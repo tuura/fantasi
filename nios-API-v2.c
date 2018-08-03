@@ -54,6 +54,7 @@ int main() {
 	srand(time(NULL));
 
 	nodes = get_number_nodes();
+
 	network = (int*) malloc(sizeof(int) * nodes);
 
 	// print_help();
@@ -63,7 +64,9 @@ int main() {
 	// qsort_pop();
 	// step(1000);
 
-	show_ga_pop();
+	// show_ga_pop();
+
+	printf("Start\n");
 
 	// while(1);
 
@@ -104,10 +107,11 @@ int main() {
 
 		if (str_starts_with(cmd, "d3")) {
 
-				init_ga(50, 400);
+				init_ga(10, 680);
 				create_ga_population();
 				qsort_pop();
-				step(10);
+				// show_ga_pop();
+				step(1000000);
 				continue;
 
 		}
