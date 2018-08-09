@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <sys/reent.h>
 #include <time.h>
+#include "ga_bv.c"
 
 // port addresses
 #define OUTPUT0 0x00101040
@@ -43,38 +44,22 @@ void growing_set(int, int);
 void brute_force(int);
 int get_number_nodes();
 
-#include "ga.c"
+// #include "ga.c"
 
 int main() {
 
 	int lim, nd;
 	int from, to, n_sim;
 
-	// random seed
-	srand(time(NULL));
+	srand(time(NULL)); // random seed
 
 	nodes = get_number_nodes();
 
 	network = (int*) malloc(sizeof(int) * nodes);
 
-	// print_help();
-
-	// init_ga(100, 5);
-	// create_ga_population();
-	// qsort_pop();
-	// step(1000);
-
-	// show_ga_pop();
-
 	printf("Start\n");
 
-	// while(1);
-
-	// crossover_etx(pop[0], pop[1]);
-	// crossover_shuffle(pop + 0, pop + 1);
-	// show_ga_pop();
-	// mate(0, 1);
-	// show_ga_pop();
+	run_ga(); while(1);
 
 	while (1) {
 
@@ -105,53 +90,26 @@ int main() {
 
 		}
 
-		if (str_starts_with(cmd, "d3")) {
+		// if (str_starts_with(cmd, "b1")) {
+		// 	init_ga(10, 680);
+		// 	create_ga_population();
+		// 	benchmark(10000);
+		// 	continue;
+		// }
 
-				init_ga(10, 680);
-				create_ga_population();
-				qsort_pop();
-				// show_ga_pop();
-				step(1000000);
-				continue;
+		// if (str_starts_with(cmd, "d3")) {
 
-		}
+		// 		unsigned long long x = -1;
 
-		if (str_starts_with(cmd, "debug2")) {
+		// 		printf("sizeof(x) = %d\n", sizeof(x));
+		// 		continue;
 
-				init_ga(10, 1400);
-				create_ga_population();
-				qsort_pop();
-				step(1000);
-				continue;
+		// 		init_ga(10, 680);
+		// 		create_ga_population();
+		// 		step(10000000);
+		// 		continue;
 
-		}
-
-
-		if (str_starts_with(cmd, "debug1")) {
-
-			// sscanf(cmd, "t1 %d", &n);
-
-			for (int n=0; n<1800; n += 50) {
-
-				init_ga(1, n);
-				create_ga_population();
-				qsort_pop();
-
-				float min = get_ga_min();
-				float max = get_ga_max();
-				float mean_2 = get_ga_mean();
-
-				printf("n = %3d, [min = %f, max = %f, first = %f]\n", n, min, max, pop[0].fitness);
-
-				// step(1000);
-
-			}
-
-			continue;
-
-		}
-
-
+		// }
 
 		// Compute ASP with some nodes disabled
 		if (str_starts_with(cmd, "disable")) {
@@ -294,29 +252,29 @@ int main() {
 
 		}
 
-		if (str_starts_with(cmd, "ga init")) {
+		// if (str_starts_with(cmd, "ga init")) {
 
-			int psize;  // population size
-			int isize;  // individual size
+		// 	int psize;  // population size
+		// 	int isize;  // individual size
 
-			sscanf(cmd, "ga init %d %d", &psize, &isize);
+		// 	sscanf(cmd, "ga init %d %d", &psize, &isize);
 
-			init_ga(psize, isize);
-			create_ga_population();
-			continue;
-		}
+		// 	init_ga(psize, isize);
+		// 	create_ga_population();
+		// 	continue;
+		// }
 
-		if (str_starts_with(cmd, "ga show")) {
+		// if (str_starts_with(cmd, "ga show")) {
 
-			show_ga_pop();
-			continue;
-		}
+		// 	show_ga_pop();
+		// 	continue;
+		// }
 
-		if (str_starts_with(cmd, "ga best")) {
+		// if (str_starts_with(cmd, "ga best")) {
 
-			printf("Best fitness: %f\n", get_ga_best(nodes));
-			continue;
-		}
+		// 	printf("Best fitness: %f\n", get_ga_best(nodes));
+		// 	continue;
+		// }
 
 		printf("Unrecognized command \n");
 
