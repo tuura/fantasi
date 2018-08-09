@@ -1,5 +1,7 @@
 #include <stdlib.h>
 
+typedef ushort cross_item_t;
+
 // #define CROSSOVER_MUTATE_DBG 1
 
 #ifdef CROSSOVER_MUTATE_DBG
@@ -144,6 +146,8 @@ void crossover_sorted(
 
 int rand_range(int mn, int mx) {
 
+    // Return random number in [mn, mx].
+
     if (mn == mx) {
         cprintf("Error, mn is equal to mx");
         return -1;
@@ -172,11 +176,6 @@ int check_sorted(cross_item_t* arr, int n) {
 }
 
 void point_mutate_sorted(cross_item_t* arr, int n, int max_val) {
-
-    // int sort_error = check_sorted(arr, n);
-
-    // if (sort_error == 1)
-    //     printf("pre-processing sort error\n");
 
     while (1) {
 
@@ -215,15 +214,55 @@ void point_mutate_sorted(cross_item_t* arr, int n, int max_val) {
 
         cprintf("Successfully inserted %d at pos %d\n", new_val, pos);
 
-        // int sort_error = check_sorted(arr, n);
-
-        // if (sort_error == 1) {
-
-        //     printf("pos = %d, mn = %d, mx = %d, new_val = %d\n",
-        //         pos, mn, mx, new_val);
-        // }
-
         return;
 
     }
+}
+
+void crossover_etx(
+        cross_item_t *p1,      // parent 1
+        cross_item_t *p2,      // parent 2
+        cross_item_t *child1,  // child 1
+        cross_item_t *child2,  // child 2
+        char *temp1,           // temporary buffer (length = n)
+        char *temp2,           // temporary buffer (length = n)
+        uint n,                // number of items in individual
+        uint item_max          // max item value
+    ) {
+
+    // Subperformant crossover of two parents.
+
+    // Uncompress parent disabled nodes into bit vectors.
+
+    for (int i=0; i<item_max; i++) {
+        temp1[i] = 0;
+        temp2[i] = 0;
+    }
+
+    for (int i=0; i<n; i++) {
+        temp1[p1[i]] = 1;
+        temp2[p2[i]] = 1;
+    }
+
+    // Scan through bitvectors and add nodes to children.
+
+    int nc1 = 0; // number of nodes in child1
+    int nc2 = 0; // number of nodes in child2
+
+    for (int i=nodes-1; i>=0; i--) {
+
+        if ((temp1[i] == 1) && (temp2[i] == 1)) {
+
+            c1[nc1++] = i;
+            c2[nc2++] = i;
+
+        } else if ((temp1[i] == 1) || (temp2[i] == 1)) {
+
+            if (nc1 < nc2) c1[nc1++] = i;
+            else           c2[nc2++] = i;
+
+        }
+
+    }
+
 }
