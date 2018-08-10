@@ -1,81 +1,31 @@
-// globals
-
-#include "crossover.c"
 #include "roulette.c"
 
 typedef ushort node_t;
 
-struct individual {
+struct ind_t {
 	float fitness;
 	node_t *disabled; // array of disabled nodes
 };
 
-struct individual *pop; // population
+float evaluate(struct ind_t *ind, int ind_size, int nodes); // must be provided by user
 
-// functions
+void show_individual(struct ind_t *ind, const char* name, int ind_size) {
 
-void show_individual(struct individual *ind, char* name) {
-
-	printf("%s (fitness %f):", name, ind->fitness);
+	printf("%s (fitness %f): ", name, ind->fitness);
 
 	for (int j=0; j<ind_size; j++)
-		printf("  %4d", ind->disabled[j]);
+		printf("%d%s", ind->disabled[j], j == ind_size-1 ? "\n" : ", ");
 
-	printf("\n");
 }
 
-// for quick sort
-int comp_nodes (const void * a, const void * b) {
+int comp_nodes(const void *a, const void *b) {
+
+	// Quick sort compare.
+
 	return ( *(node_t*)b - *(node_t*)a );
 }
 
-
-// turn off the nodes in the array
-void turnoff_nodes_b(node_t *nodes_to_disable, int n){
-
-	int i = 0;
-	int c = nodes - 1;
-
-	for(i=0; i<n; i++) {
-		insert_ones(c - nodes_to_disable[i]);
-		insert_zero();
-		c = nodes_to_disable[i] - 1;
-	}
-
-	if (c)
-		insert_ones(c + 1);
-	else
-		insert_ones(1);
-}
-
-
-float eval_ind(struct individual *ind) {
-
-	reset_network();
-	turnoff_nodes_b(ind->disabled, ind_size);
-	start_test();
-	int sp = read_result();
-	return avg_path(sp, ind_size);
-}
-
-
-void show_ga_pop() {
-
-	// Print population table.
-
-	printf("Population: %d individuals of %d nodes each.\n\n", pop_size, ind_size);
-
-	for (int i=0; i<pop_size; i++) {
-
-		printf("Individual %3d (fitness %f):", i, pop[i].fitness);
-
-		for (int j=0; j<ind_size; j++) printf("  %4d", pop[i].disabled[j]);
-
-			printf("\n");
-	}
-}
-
-int compete(float p) {
+int compete(struct ind_t* pop, float p, int pop_size) {
 
 	// Run a selection tournment match.
 
@@ -100,7 +50,9 @@ int compete(float p) {
 
 }
 
-void point_mutate(struct individual* ind) {
+void point_mutate(struct ind_t* ind, int ind_size, int nodes) {
+
+	// Point mutate an individual.
 
 	int new_node = -1;
 
@@ -130,7 +82,7 @@ void init_ind(struct ind_t* ind, int ind_size) {
 	// Initialize individual data structures.
 
 	ind->fitness = 0;
-	ind->disabled = malloc(sizeof(node_t) * ind_size);
+	ind->disabled = (node_t*) malloc(sizeof(node_t) * ind_size);
 
 	if (ind->disabled == NULL)
 		printf("Error, out of memory\n");
@@ -147,51 +99,115 @@ void copy_ind(struct ind_t* src, struct ind_t* dst, int ind_size) {
 
 }
 
-ind_t* create_pop(int pop_size) {
+struct ind_t* create_pop(int pop_size, int ind_size, int nodes) {
 
 	// Create population.
 
-	struct ind_t* pop = malloc(sizeof(struct ind_t) * pop_size);
+	struct ind_t* pop = (struct ind_t*) malloc(sizeof(struct ind_t) * pop_size);
 
-	if (pop == NULL) {
-		printf("Not enough memory.\n");
-		return;
-	}
+	if (pop == NULL)
+		return NULL;
+
+	init_roulette(nodes);
 
 	for (int i=0; i<pop_size; i++) {
 
-		init_ind(pop + i);
+		init_ind(pop + i, ind_size);
 		reset_roulette();
 
 		for (int j=0; j< ind_size; j++)
-			pop[i].disabled[j] = sample_roulette();;
+			pop[i].disabled[j] = sample_roulette();
 
-		pop[i].fitness = eval_ind(pop + i);
+		qsort(pop[i].disabled, ind_size, sizeof(node_t), comp_nodes);
+
+		pop[i].fitness = evaluate(pop + i, ind_size, nodes);
 	}
 
 	return pop;
 
 }
 
+void free_pop(struct ind_t* pop, int pop_size) {
 
-void run_ga(int pop_size, int ind_size, int nodes) {
+	// Free memory used by population.
 
-	uint rounds = 1000;
+	for (int i=0; i<pop_size; i++)
+		free(pop[i].disabled);
+
+	free(pop);
+
+}
+
+void crossover(
+        node_t *p1,    // parent 1
+        node_t *p2,    // parent 2
+        node_t *c1,    // child 1
+        node_t *c2,    // child 2
+        char *temp1,   // temporary buffer (length = n)
+        char *temp2,   // temporary buffer (length = n)
+        uint n,        // number of items in individual
+        uint item_max  // max item value
+    ) {
+
+    // Subperformant crossover of two parents.
+
+    // Uncompress parent disabled nodes into bit vectors.
+
+    for (int i=0; i<item_max; i++) {
+        temp1[i] = 0;
+        temp2[i] = 0;
+    }
+
+    for (int i=0; i<n; i++) {
+        temp1[p1[i]] = 1;
+        temp2[p2[i]] = 1;
+    }
+
+    // Scan through bitvectors and add nodes to children.
+
+    int nc1 = 0; // number of nodes in child1
+    int nc2 = 0; // number of nodes in child2
+
+    for (int i=item_max-1; i>=0; i--) {
+
+        if ((temp1[i] == 1) && (temp2[i] == 1)) {
+
+            c1[nc1++] = i;
+            c2[nc2++] = i;
+
+        } else if ((temp1[i] == 1) || (temp2[i] == 1)) {
+
+            if (nc1 < nc2) c1[nc1++] = i;
+            else           c2[nc2++] = i;
+
+        }
+
+    }
+
+}
+
+struct ind_t* run_ga(int pop_size, int ind_size, int nodes, int rounds) {
+
 	uint checkpoint = 100; // result printout interval
 
 	float p = 0.7; // selection parameter
 
 	// Prepare population
 
-	ind_t* pop = create_pop(pop_size, ind_size);
+	struct ind_t* pop = create_pop(pop_size, ind_size, nodes);
+
+	if (pop == NULL) {
+		printf("Cannot create population, insufficient memory.\n");
+		return NULL;
+	}
 
 	// Prepare children
 
 	struct ind_t child1;
 	struct ind_t child2;
 
-	init_ind(child1);
-	init_ind(child2);
+	init_ind(&child1, ind_size);
+	init_ind(&child2, ind_size);
 
 	struct ind_t* c1 = &child1;
 	struct ind_t* c2 = &child2;
@@ -208,20 +224,22 @@ void run_ga(int pop_size, int ind_size, int nodes) {
 
 	// Start GA loop
 
+	struct ind_t* top = pop; // best solution
+
 	for (int r=0; r<rounds; r++) {
 
 		// Select parents by tournament matches
 
-		struct ind_t *p1 = pop + compete(p);
-		struct ind_t *p2 = pop + compete(p);
+		struct ind_t *p1 = pop + compete(pop, p, pop_size);
+		struct ind_t *p2 = pop + compete(pop, p, pop_size);
 
 		// Generate children by crossing over parents
 
-		crossover_etx(
-			p1->bv,
-			p2->bv,
-			c1->bv,
-			c2->bv,
+		crossover(
+			p1->disabled,
+			p2->disabled,
+			c1->disabled,
+			c2->disabled,
 			temp1,
 			temp2,
 			ind_size,
@@ -230,13 +248,13 @@ void run_ga(int pop_size, int ind_size, int nodes) {
 
 		// Mutate children
 
-		point_mutate(c1);
-		point_mutate(c2);
+		point_mutate(c1, ind_size, nodes);
+		point_mutate(c2, ind_size, nodes);
 
 		// Evaluate fitness of children.
 
-		c1->fitness = eval_ind(c1);
-		c2->fitness = eval_ind(c2);
+		c1->fitness = evaluate(c1, ind_size, nodes);
+		c2->fitness = evaluate(c2, ind_size, nodes);
 
 		// Overwrite parents with (better) children
 
@@ -253,7 +271,7 @@ void run_ga(int pop_size, int ind_size, int nodes) {
 
 		for (int i=1; i<pop_size; i++) {
 			float ft = pop[i].fitness;
-			ind = ft>max ? i : ind;
+			top = ft>max ? pop+i : top;
 			max = ft>max ? ft : max;
 			min = ft<min ? ft : min;
 			sum = sum + ft;
@@ -269,10 +287,10 @@ void run_ga(int pop_size, int ind_size, int nodes) {
 
 	}
 
-	// TODO: dealloc population disabled nodes
-	// TODO: deallow population
-
+	free_pop(pop, pop_size);
 	free(temp1);
 	free(temp2);
+
+	return top;
 
 }

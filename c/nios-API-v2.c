@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <sys/reent.h>
 #include <time.h>
-#include "ga_bv.c"
+#include "ga.c"
 
 // port addresses
 #define OUTPUT0 0x00101040
@@ -44,7 +44,35 @@ void growing_set(int, int);
 void brute_force(int);
 int get_number_nodes();
 
-// #include "ga.c"
+float evaluate(struct ind_t *ind, int ind_size, int nodes) {
+
+	reset_network();
+
+	// Populate shift register
+
+	int c = nodes - 1;
+
+	for(int i=0; i<ind_size; i++) {
+		insert_ones(c - ind->disabled[i]);
+		insert_zero();
+		c = ind->disabled[i] - 1;
+	}
+
+	if (c)
+		insert_ones(c + 1);
+	else
+		insert_ones(1);
+
+	// Start analysis
+
+	start_test();
+
+	// Calculate fitness
+
+	float fitness = avg_path(read_result(), ind_size);
+
+	return fitness;
+}
 
 int main() {
 
@@ -59,7 +87,15 @@ int main() {
 
 	printf("Start\n");
 
-	run_ga(); while(1);
+	int rounds = 5000;
+	int pop_size = 10;
+	int ind_size = 680;
+
+	struct ind_t* best = run_ga(pop_size, ind_size, nodes, rounds);
+
+	show_individual(best, "Best individual", ind_size);
+
+	while(1);
 
 	while (1) {
 
@@ -89,27 +125,6 @@ int main() {
 			continue;
 
 		}
-
-		// if (str_starts_with(cmd, "b1")) {
-		// 	init_ga(10, 680);
-		// 	create_ga_population();
-		// 	benchmark(10000);
-		// 	continue;
-		// }
-
-		// if (str_starts_with(cmd, "d3")) {
-
-		// 		unsigned long long x = -1;
-
-		// 		printf("sizeof(x) = %d\n", sizeof(x));
-		// 		continue;
-
-		// 		init_ga(10, 680);
-		// 		create_ga_population();
-		// 		step(10000000);
-		// 		continue;
-
-		// }
 
 		// Compute ASP with some nodes disabled
 		if (str_starts_with(cmd, "disable")) {
@@ -251,30 +266,6 @@ int main() {
 			continue;
 
 		}
-
-		// if (str_starts_with(cmd, "ga init")) {
-
-		// 	int psize;  // population size
-		// 	int isize;  // individual size
-
-		// 	sscanf(cmd, "ga init %d %d", &psize, &isize);
-
-		// 	init_ga(psize, isize);
-		// 	create_ga_population();
-		// 	continue;
-		// }
-
-		// if (str_starts_with(cmd, "ga show")) {
-
-		// 	show_ga_pop();
-		// 	continue;
-		// }
-
-		// if (str_starts_with(cmd, "ga best")) {
-
-		// 	printf("Best fitness: %f\n", get_ga_best(nodes));
-		// 	continue;
-		// }
 
 		printf("Unrecognized command \n");
 
