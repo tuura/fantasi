@@ -226,9 +226,14 @@ void crossover(
 
 }
 
-struct ind_t* run_ga(int pop_size, int ind_size, int nodes, int rounds) {
-
-	uint checkpoint = 100; // result printout interval
+void run_ga(
+		int pop_size,
+		int ind_size,
+		int nodes,
+		int rounds,
+		int checkpoint,
+		int simple_output
+	) {
 
 	float p = 0.7; // selection parameter
 
@@ -238,7 +243,7 @@ struct ind_t* run_ga(int pop_size, int ind_size, int nodes, int rounds) {
 
 	if (pop == NULL) {
 		printf("Cannot create population, insufficient memory.\n");
-		return NULL;
+		return;
 	}
 
 	// Prepare children
@@ -266,7 +271,7 @@ struct ind_t* run_ga(int pop_size, int ind_size, int nodes, int rounds) {
 
 	struct ind_t* top = pop; // best solution
 
-	for (int r=0; r<rounds; r++) {
+	for (int r=1; r<=rounds; r++) {
 
 		// Select parents by tournament matches
 
@@ -322,15 +327,17 @@ struct ind_t* run_ga(int pop_size, int ind_size, int nodes, int rounds) {
 		if (r % checkpoint)
 			continue;
 
-		printf("Round %d: mean %1.2f [%1.2f, %1.2f]\n",
-			r, sum / pop_size, min, max);
+		if (simple_output) {
+			printf("%1.2f%s", max, r == rounds ? "\n" : ", ");
+		} else {
+			printf("Round %d: mean %1.2f [%1.2f, %1.2f]\n",
+				r, sum / pop_size, min, max);
+		}
 
 	}
 
 	free_pop(pop, pop_size);
 	free(temp1);
 	free(temp2);
-
-	return top;
 
 }

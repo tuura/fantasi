@@ -44,7 +44,7 @@ void growing_set(int, int);
 void brute_force(int);
 int get_number_nodes();
 
-int asp_baseline; // ASP with all nodes enabled
+float asp_baseline; // ASP with all nodes enabled
 
 float calculate_asp_basline() {
 
@@ -84,6 +84,29 @@ float evaluate(struct ind_t *ind, int ind_size, int nodes) {
 	return impact(asp_baseline, asp); // fitness
 }
 
+void sweep_ga() {
+
+	asp_baseline = calculate_asp_basline();
+
+	int rounds = 1e5;
+	int pop_size = 10;
+	int ind_size = 400;
+	int checkpoint = 100;
+	int simple_output = 0;
+
+	simple_output = 1;
+	checkpoint = 1e3;
+
+	for (int i=25; i<1000; i+=25) {
+		ind_size = i;
+		printf("%4d : ", ind_size);
+		run_ga(pop_size, ind_size, nodes, rounds, checkpoint, simple_output);
+	}
+
+	while (1);
+
+}
+
 int main() {
 
 	int lim, nd;
@@ -97,19 +120,7 @@ int main() {
 
 	printf("Start\n");
 
-	calculate_asp_basline();
-
-	asp_baseline = calculate_asp_basline();
-
-	int rounds = 1e8;
-	int pop_size = 10;
-	int ind_size = 680;
-
-	struct ind_t* best = run_ga(pop_size, ind_size, nodes, rounds);
-
-	show_individual(best, "Best individual", ind_size);
-
-	while(1);
+	sweep_ga();
 
 	while (1) {
 
