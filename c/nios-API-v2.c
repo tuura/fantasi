@@ -44,6 +44,15 @@ void growing_set(int, int);
 void brute_force(int);
 int get_number_nodes();
 
+int asp_baseline; // ASP with all nodes enabled
+
+float calculate_asp_basline() {
+
+	reset_network();
+	start_test();
+	return avg_path(read_result(), 0);
+}
+
 float evaluate(struct ind_t *ind, int ind_size, int nodes) {
 
 	reset_network();
@@ -53,7 +62,8 @@ float evaluate(struct ind_t *ind, int ind_size, int nodes) {
 	int c = nodes - 1;
 
 	for(int i=0; i<ind_size; i++) {
-		insert_ones(c - ind->disabled[i]);
+		int ones = c - ind->disabled[i];
+		if (ones) insert_ones(ones);
 		insert_zero();
 		c = ind->disabled[i] - 1;
 	}
@@ -69,9 +79,9 @@ float evaluate(struct ind_t *ind, int ind_size, int nodes) {
 
 	// Calculate fitness
 
-	float fitness = avg_path(read_result(), ind_size);
+	float asp = avg_path(read_result(), ind_size);
 
-	return fitness;
+	return impact(asp_baseline, asp); // fitness
 }
 
 int main() {
@@ -87,7 +97,11 @@ int main() {
 
 	printf("Start\n");
 
-	int rounds = 5000;
+	calculate_asp_basline();
+
+	asp_baseline = calculate_asp_basline();
+
+	int rounds = 1e8;
 	int pop_size = 10;
 	int ind_size = 680;
 

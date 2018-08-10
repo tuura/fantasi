@@ -50,31 +50,71 @@ int compete(struct ind_t* pop, float p, int pop_size) {
 
 }
 
-void point_mutate(struct ind_t* ind, int ind_size, int nodes) {
+void bubble_new_element(node_t *arr, int n, int pos) {
 
-	// Point mutate an individual.
+	// Given a (previously) sorted array in which a new element has been
+	// inserted, move the element up/down as necessary until the array is
+	// sorted again.
 
-	int new_node = -1;
+	// `n` is the length of the array and `pos` is the index of the inserted
+	// `element.
 
-	while (new_node == -1) {
+	if (pos > 0 && (arr[pos] > arr[pos-1])) {
 
-		new_node = rand() % nodes;
+		// Move up
 
-		for (int i=0; i<ind_size; i++) {
+		while (1) {
+			if (pos < 1) return;
+			if (arr[pos] < arr[pos-1]) return;
+			node_t temp = arr[pos-1];
+			arr[pos-1] = arr[pos];
+			arr[pos] = temp;
+			pos--;
+		}
 
-			if (ind->disabled[i] == new_node) {
-				new_node = -1;
-				break;
-			}
+	} else if (pos < n-1 && (arr[pos] < arr[pos+1])) {
+
+		// Move down
+
+		while (1) {
+			if (pos > n-2) return;
+			if (arr[pos] > arr[pos+1]) return;
+			node_t temp = arr[pos+1];
+			arr[pos+1] = arr[pos];
+			arr[pos] = temp;
+			pos++;
 		}
 
 	}
 
-	int pos = rand() % ind_size;
+}
 
-	ind->disabled[pos] = new_node;
+void point_mutate(struct ind_t* ind, int ind_size, int nodes, char* temp1) {
 
-	qsort(ind->disabled, ind_size, sizeof(node_t), comp_nodes);
+	// Point mutate an individual.
+
+	for (int i=0; i<nodes; i++)
+	    temp1[i] = 0;
+
+	for (int i=0; i<ind_size; i++)
+		temp1[ind->disabled[i]] = 1;
+
+	while (1) {
+
+		node_t new_node = rand() % nodes;
+
+		if (temp1[new_node] == 1)
+			continue;
+
+		int pos = rand() % ind_size;
+
+		ind->disabled[pos] = new_node;
+
+		bubble_new_element(ind->disabled, ind_size, pos);
+
+		break;
+	}
+
 }
 
 void init_ind(struct ind_t* ind, int ind_size) {
@@ -248,8 +288,8 @@ struct ind_t* run_ga(int pop_size, int ind_size, int nodes, int rounds) {
 
 		// Mutate children
 
-		point_mutate(c1, ind_size, nodes);
-		point_mutate(c2, ind_size, nodes);
+		point_mutate(c1, ind_size, nodes, temp1);
+		point_mutate(c2, ind_size, nodes, temp1);
 
 		// Evaluate fitness of children.
 
