@@ -11,7 +11,8 @@ data Options = Options
     , optVersion   :: Bool
     , optGraphML   :: FilePath
     , optGraphName :: FilePath
-    , optSimName   :: FilePath }
+    , optSimName   :: FilePath
+    , optAliasHub     :: Bool }
 
 defaultOptions :: Options
 defaultOptions = Options
@@ -19,7 +20,8 @@ defaultOptions = Options
     , optVersion   = False
     , optGraphML   = ""
     , optGraphName = "graph.vhdl"
-    , optSimName   = "sim-environment.vhdl" }
+    , optSimName   = "sim-environment.vhdl"
+    , optAliasHub     = False }
 
 options :: [OptDescr (Options -> IO Options)]
 options =
@@ -38,6 +40,10 @@ options =
     , Option ['v'] ["version"]
       (NoArg (\opts -> return opts { optVersion = True }))
       "Show version of Fantasi"
+
+    , Option ['a'] ["alias-hub"]
+      (NoArg (\opts -> return opts { optAliasHub = False }))
+      "Alias the largest hub to improve FPGA routing"
     ]
 
 getOptions :: IO Options
