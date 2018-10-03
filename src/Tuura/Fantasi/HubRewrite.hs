@@ -98,7 +98,7 @@ identifyEdgesAndSplit p bs = let
     inComing e = (bs == snd e)
     outGoing :: Endpoints -> Bool
     outGoing e = (bs == fst e)
-    
+
     -- Split the list incoming or outoging by two, leaving the first larger then the last if list is uneven.
     splitListInTwo :: [Endpoints] -> ([Endpoints], [Endpoints])
     splitListInTwo myList = splitAt ((length myList + 1) `div` 2) myList
@@ -119,11 +119,8 @@ generateAliasVertexIDs n bs = map (\i -> bs `BS.append` ps i) (generateMatrixCor
         generateMatrixCords 0 = []
         generateMatrixCords n' = concatMap (\l -> zip (repeat l) [1..n']) [1..n']
 
--- Build an attribute as it would appear from GraphML for a Vertex.
-idToAttribute :: VertexID -> [Attribute]
-idToAttribute vID = [("id", vID)]
-
--- Remove the a Vertex and return remaining vetices + new  aliased vertices
+        
+        -- Remove the a Vertex and return remaining vetices + new  aliased vertices
 replaceVertex :: Pangraph -> VertexID -> [Vertex]
 replaceVertex p vID = let
     -- Keep all but the given VertexID
@@ -131,10 +128,10 @@ replaceVertex p vID = let
     remainingVertices = filter (\v -> vID /= vertexID v) . vertexList
     -- Generate the aliases.
     newVertices :: VertexID -> [Vertex]
-    newVertices =  map (f . idToAttribute) . generateAliasVertexIDs 2
+    newVertices =  map makeVertex' . generateAliasVertexIDs 2
         where
-            f :: [Attribute] -> Vertex
-            f as = makeVertex (fromJust $ lookup "id" as) as
+            makeVertex' :: VertexID -> Vertex
+            makeVertex' vID' = makeVertex vID' [("id", vID')]
     -- Concatenate and return
     in (newVertices vID ++ remainingVertices p)
 
@@ -144,12 +141,14 @@ replaceEdges p vID setTuple@(setA, setB) = let
     -- Build the set from the Pangraph
     currentSet :: Set OrderEdgeByEnds
     currentSet = Set.fromList . map OrderEdgeByEnds . edgeList $ p
+    
     -- Build the set from neighbours to be removed.
     combinedSet :: Set OrderEdgeByEnds
     combinedSet = Set.map (OrderEdgeByEnds . makeEdge') (setA `Set.union` setB)
+    
+    -- Make edge in GraphML Style
     makeEdge' :: Endpoints -> Edge
     makeEdge' (a, b) = makeEdge (a,b) [("source", a), ("target", b)]
-
 
     -- Take the difference of the sets to remove old edges.
     remainingEdges :: [Edge]
@@ -162,6 +161,7 @@ replaceEdges p vID setTuple@(setA, setB) = let
     -- The list of combinations.
     sumList :: [(VertexID, VertexID) -> NeighbourCombinations]
     sumList = [AA, AB, BA, BB]
+
     -- Concatenate and return.
     in remainingEdges ++ newEdges
 
@@ -188,14 +188,17 @@ aliasHub p = let
     -- Find the largest degree VertexID
     largestDeg :: VertexID
     largestDeg = largestDegreeNode p
-    -- Find all edges connecting this Vertex.
-    (setA, setB) = identifyEdgesAndSplit p largestDeg
+    -- Find all edges connecting this Vertex,
+    -- split them into input and output balanced groups.
+    (vsA, vsB) = identifyEdgesAndSplit p largestDeg
     -- Transform into actual sets.
     endsSet :: (Set Endpoints , Set Endpoints)
-    endsSet = (Set.fromList setA, Set.fromList setB)
-    -- Generate the Vertice's aliases.
+    endsSet = (Set.fromList vsA, Set.fromList vsB)
+    -- Replace old with new for edges and the Vertex.
     vs :: [Vertex]
     vs = replaceVertex p largestDeg
     es :: [Edge]
     es = replaceEdges p largestDeg endsSet
+    -- Build and verify the new Graph!
+    -- Possibly check connectivity with a Graph Library?
     in makePangraph vs es
