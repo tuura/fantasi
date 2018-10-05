@@ -3,6 +3,7 @@ extra-package-dbs: []
 packages:
 - .
 extra-deps:
-- pangraph-0.2.0
+- pangraph-0.2.1
 - html-entities-1.1.4.2
-resolver: lts-11.3
+- algebraic-graphs-0.2
+resolver: lts-12.0
