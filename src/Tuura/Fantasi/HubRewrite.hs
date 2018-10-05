@@ -37,31 +37,6 @@ instance Eq OrderEdgeByEnds where
 instance Ord OrderEdgeByEnds where
     compare (OrderEdgeByEnds a) (OrderEdgeByEnds b) = compare (edgeEndpoints a) (edgeEndpoints b)
 
--- driveN1 :: IO ()
--- driveN1 = do
---     p <- fromJust . GraphML.parse <$> BS.readFile "./n1.graphml"
---     let largestDeg = largestDegreeNode p
---     let (setA, setB) = identifyEdgesAndSplit p largestDeg
---     let vs = replaceVertex p largestDeg
---     -- endsSet :: (Set Endpoints , Set Endpoints)
---     let endsSet = (Set.fromList setA, Set.fromList setB)
---     let es = replaceEdges p largestDeg endsSet
-
---     putStrLn "SetA"
---     mapM_ print setA
---     putStrLn "------------"
---     putStrLn "SetB"
---     mapM_ print setB
---     putStrLn "------------"
---     putStrLn "New Vertex Ids"
---     mapM_ print $ generateAliasVertexIDs  2 largestDeg
---     putStrLn "------------"
---     putStrLn "New Vertices"
---     mapM_ print vs
---     putStrLn "------------"
---     putStrLn "New Edge List"
---     mapM_ print es
-
 -- Useful alias.
 type Endpoints = (VertexID, VertexID)
 
