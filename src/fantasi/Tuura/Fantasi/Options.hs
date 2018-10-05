@@ -21,7 +21,7 @@ defaultOptions = Options
     , optGraphML   = ""
     , optGraphName = "graph.vhdl"
     , optSimName   = "sim-environment.vhdl"
-    , optAliasHub     = False }
+    , optAliasHub  = False }
 
 options :: [OptDescr (Options -> IO Options)]
 options =
