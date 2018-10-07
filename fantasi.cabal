@@ -33,8 +33,7 @@ library
   exposed-modules:     Tuura.Fantasi.VHDL.Internal.EnvironmentWriter,
                        Tuura.Fantasi.VHDL.Internal.GraphWriter,
                        Tuura.Fantasi.VHDL.Writer,
-                       Tuura.Fantasi.HubRewrite,
-                       Tuura.Fantasi.Alga
+                       Tuura.Fantasi.HubRewrite
   -- other-modules:
   build-depends:       base >= 4 && < 5,
                        bytestring,
