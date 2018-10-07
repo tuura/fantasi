@@ -22,15 +22,15 @@ import Data.Set(toList)
 splitHub :: Ord a => a -> (a, a, a, a) -> Graph a -> Graph a
 splitHub x (x00, x01, x10, x11) g = overlays
     [ removeVertex x g 
-    , biclique ai [x00, x01]
-    , biclique bi [x10, x11]
-    , biclique [x00, x10] ao
-    , biclique [x01, x11] bo ]
+    , biclique in0 [x00, x01]
+    , biclique in1 [x10, x11]
+    , biclique [x00, x10] out0
+    , biclique [x01, x11] out1 ]
   where
     breakInHalf as =    let i = length as `div` 2
                         in (take i as, drop i as) 
-    (ai, bi) = breakInHalf . toList $ preSet x g
-    (ao, bo) = breakInHalf . toList $ postSet x g
+    (in0 , in1 ) = breakInHalf . toList $ preSet x g
+    (out0, out1) = breakInHalf . toList $ postSet x g
 
 -- Useful alias.
 type Endpoints = (VertexID, VertexID)
