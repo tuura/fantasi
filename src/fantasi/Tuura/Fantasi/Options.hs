@@ -12,7 +12,7 @@ data Options = Options
     , optGraphML   :: FilePath
     , optGraphName :: FilePath
     , optSimName   :: FilePath
-    , optAliasHub     :: Bool }
+    , optAliasHub  :: Bool }
 
 defaultOptions :: Options
 defaultOptions = Options
