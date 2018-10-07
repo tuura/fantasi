@@ -10,7 +10,7 @@ import qualified Data.ByteString as BS
 
 import Data.List(sortBy)
 
-import Algebra.Graph 
+import Algebra.Graph hiding (vertexList, edgeList)
 import Algebra.Graph.ToGraph hiding(vertexList, edgeList)
 import qualified Algebra.Graph.ToGraph as Alga
 
@@ -58,9 +58,16 @@ generateAliasVertexIDs n bs = map (\i -> bs `BS.append` ps i) (generateMatrixCor
         generateMatrixCords 0 = []
         generateMatrixCords n' = concatMap (\l -> zip (repeat l) [1..n']) [1..n']
 
+-- | Take a graph finds it largest hub and replace with a set of four
+-- equivalently connected aliases.
 aliasHub :: Pangraph -> Maybe Pangraph
 aliasHub p = let
-    gOriginal = Alga.toGraph p
+    gOriginal = 
+        let vertexSuitability = (length . vertexList) p > 1 
+            edgeSuitability = (length . edgeList) p > 2
+        in  if vertexSuitability && edgeSuitability 
+                then Alga.toGraph p
+                else error "Graph is not suitable for aliasing as it has too few Vertices or Edges!"
     vID:_ = largestDegreeNodes gOriginal
     aliasIDs = generateAliasVertexIDs 2 vID
     -- Is there a better way?

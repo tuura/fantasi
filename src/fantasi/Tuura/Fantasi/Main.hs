@@ -35,10 +35,8 @@ main = do
 getPangraph :: ByteString -> Options -> Pangraph
 getPangraph bs options = let
     applyAlias = if optAliasHub options
-                then aliasHub
-                else Just 
+        then aliasHub
+        else Just 
     maybePangraph = P.parse bs >>= applyAlias
     in fromMaybe (error errMsg) maybePangraph 
-    where errMsg = "Pangraph is nothing! Does the graph construct? Further if \
-        \ -a is enabled, does the graph have vertices and edges?"
-        
+    where errMsg = "Pangraph is nothing! Does the graph construct?"
