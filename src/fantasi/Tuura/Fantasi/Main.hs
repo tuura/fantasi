@@ -21,10 +21,8 @@ main = do
 
     when runAlias (print "Running Alias")
 
-    -- parse graph
-    maybePangraph <- (`getPangraph` options) <$> readFile graphMLPath
-    let pangraph = fromMaybe (error "Pangraph is nothing!") maybePangraph 
-    -- let Just pangraph =  maybePangraph 
+    -- read and parse graph, handling error with a message.
+    pangraph <- (`getPangraph` options) <$> readFile graphMLPath
     
     let graphVHDL   = VHDL.writeGraph pangraph
     let simEnvVHDL  = VHDL.writeEnvironment pangraph
@@ -34,10 +32,13 @@ main = do
     -- output vhdl simulation environment
     writeFile simulationEnvVhdlPath simEnvVHDL
 
-getPangraph :: ByteString -> Options -> Maybe Pangraph
-getPangraph bs options =
-    P.parse bs >>= condition
-    where
-        condition = if optAliasHub options
-            then aliasHub
-            else Just 
+getPangraph :: ByteString -> Options -> Pangraph
+getPangraph bs options = let
+    applyAlias = if optAliasHub options
+                then aliasHub
+                else Just 
+    maybePangraph = P.parse bs >>= applyAlias
+    in fromMaybe (error errMsg) maybePangraph 
+    where errMsg = "Pangraph is nothing! Does the graph construct? Further if \
+        \ -a is enabled, does the graph have vertices and edges?"
+        
